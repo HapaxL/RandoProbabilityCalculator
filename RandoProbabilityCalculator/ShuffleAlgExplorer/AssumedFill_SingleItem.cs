@@ -12,27 +12,28 @@ namespace RandoProbabilityCalculator.ShuffleAlgExplorer
         public override Dictionary<string, long> Shuffle(Outcome outcome)
         {
             Console.WriteLine("starting singleitem");
-            var compiled = new Dictionary<string, long>();
-            Shuffle(compiled, outcome);
+            var compiled = SubShuffle(outcome);
             Console.WriteLine("ending singleitem");
             return compiled;
         }
 
-        public void Shuffle(Dictionary<string, long> compiled, Outcome outcome)
+        public Dictionary<string, long> SubShuffle(Outcome outcome)
         {
             // Console.WriteLine($"{outcome.UnplacedItems.Count} unplaced items");
-
+            
             if (outcome.UnplacedItems.Count == 0 || outcome.EmptyLocations.Count == 0)
             {
                 ocCount++;
                 if (ocCount % 1000 == 0) Console.WriteLine(ocCount);
-                CompileOutcome(ocCount, compiled, outcome);
+                // CompileOutcome(ocCount, compiled, outcome);
                 //if (ocCount == 682922)
                 //{
                 //    Console.WriteLine("problematic");
                 //}
-                return;
+                return CompileSingleOutcome(ocCount, outcome);
             }
+
+            var compileds = new List<Dictionary<string, long>>();
 
             var reachableResults = new Dictionary<Item, List<Location>>();
 
@@ -61,21 +62,25 @@ namespace RandoProbabilityCalculator.ShuffleAlgExplorer
             {
                 if (result.Value.Count == 0)
                 {
-                    CompileOutcome(0, compiled, new FailedOutcome());
+                    CompileSingleOutcome(0, new FailedOutcome());
                     continue;
                 }
                 else if (result.Value.Count == 1)
                 {
-                    Shuffle(compiled, newOutcome);
+                    var compiled = SubShuffle(newOutcome);
+                    compileds.Add(compiled);
                 }
                 else
                 {
                     foreach (var location in result.Value)
                     {
-                        Shuffle(compiled, newOutcome.WithItemInLocation(result.Key, location));
+                        var compiled = SubShuffle(newOutcome.WithItemInLocation(result.Key, location));
+                        compileds.Add(compiled);
                     }
                 }
             }
+
+            return CompileOutcomes(compileds);
         }
 
         public List<Item> FetchAllItems(List<Item> unplacedItems, SortedList<Location, Item> world)

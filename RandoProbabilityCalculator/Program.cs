@@ -133,11 +133,11 @@ namespace RandoProbabilityCalculator
 
             var random = new RandomFill();
             var assumed = new AssumedFill();
-            // var singleAdjusted = new AssumedFill_SingleItem_AdjustedCount();
+            var single = new AssumedFill_SingleItem();
 
-            // var sacompiled = singleAdjusted.Shuffle(oc);
             var rcompiled = random.Shuffle(oc);
             var acompiled = assumed.Shuffle(oc);
+            var scompiled = single.Shuffle(oc);
 
             var failedOutcomeString = new FailedOutcome().GetWorldString(0);
 
@@ -171,11 +171,20 @@ namespace RandoProbabilityCalculator
                 }
             }
 
-            //Console.WriteLine("SingleItem Adjusted:");
-            //foreach (var c in sacompiled)
-            //{
-            //    Console.WriteLine($"{c.Key}: {c.Value}");
-            //}
+            Console.WriteLine("SingleItem:");
+            var stotal = scompiled.Values.Sum();
+            var stotalSuccesses = stotal - scompiled[failedOutcomeString];
+            foreach (var c in scompiled)
+            {
+                if (c.Key == failedOutcomeString)
+                {
+                    Console.WriteLine($"{c.Key}: {c.Value} ({100.0 * c.Value / stotal}% of total)");
+                }
+                else
+                {
+                    Console.WriteLine($"{c.Key}: {c.Value} ({100.0 * c.Value / stotal}% of total, {100.0 * c.Value / stotalSuccesses}% of successes)");
+                }
+            }
         }
     }
 }

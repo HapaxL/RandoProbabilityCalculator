@@ -12,13 +12,12 @@ namespace RandoProbabilityCalculator.ShuffleAlgExplorer
         public override Dictionary<string, long> Shuffle(Outcome outcome)
         {
             Console.WriteLine("starting random");
-            var compiled = new Dictionary<string, long>();
-            Shuffle(compiled, 0, outcome);
+            var compiled = SubShuffle(0, outcome);
             Console.WriteLine("ending random");
             return compiled;
         }
 
-        public void Shuffle(Dictionary<string, long> compiled, int curLoc, Outcome outcome)
+        public Dictionary<string, long> SubShuffle(int curLoc, Outcome outcome)
         {
             if (outcome.UnplacedItems.Count == 0 || outcome.EmptyLocations.Count == 0)
             {
@@ -26,18 +25,20 @@ namespace RandoProbabilityCalculator.ShuffleAlgExplorer
                 if (ocCount % 1000 == 0) Console.WriteLine(ocCount);
                 
                 if (outcome.IsCompletable())
-                    CompileOutcome(ocCount, compiled, outcome);
+                    return CompileSingleOutcome(ocCount, outcome);
                 else
-                    CompileOutcome(ocCount, compiled, new FailedOutcome());
-
-                return;
+                    return CompileSingleOutcome(ocCount, new FailedOutcome());
             }
+
+            var compileds = new List<Dictionary<string, long>>();
 
             foreach (var item in outcome.UnplacedItems.Distinct())
             {
                 var loc = outcome.World.ElementAt(curLoc);
 
-                Shuffle(compiled, curLoc + 1, outcome.WithItemInLocation(item, loc.Key));
+                var compiled = SubShuffle(curLoc + 1, outcome.WithItemInLocation(item, loc.Key));
+                compileds.Add(compiled);
+                
 
 
                 //foreach (var location in outcome.EmptyLocations)
@@ -45,6 +46,8 @@ namespace RandoProbabilityCalculator.ShuffleAlgExplorer
                 //    Shuffle(compiled, outcome.WithItemInLocation(item, location));
                 //}
             }
+
+            return CompileOutcomes(compileds);
         }
     }
 }

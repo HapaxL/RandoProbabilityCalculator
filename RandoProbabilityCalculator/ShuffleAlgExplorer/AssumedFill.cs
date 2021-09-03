@@ -56,32 +56,7 @@ namespace RandoProbabilityCalculator.ShuffleAlgExplorer
                 }
             }
 
-            var totals = compileds.ToDictionary(c => c, c => c.Values.Sum());
-            var lcm = HapaxTools.Math.LeastCommonMultiple(totals.Values.ToList());
-
-            var allCompiled = new Dictionary<string, long>();
-
-            foreach (var compiled in compileds)
-            {
-                var total = totals[compiled];
-
-                foreach (var kvp in compiled)
-                {
-                    var oc = kvp.Key;
-                    var probaRate = kvp.Value * (lcm / total);
-
-                    if (allCompiled.ContainsKey(oc))
-                    {
-                        allCompiled[oc] += probaRate;
-                    }
-                    else
-                    {
-                        allCompiled.Add(oc, probaRate);
-                    }
-                }
-            }
-
-            return allCompiled;
+            return CompileOutcomes(compileds);
         }
 
         public List<Item> FetchAllItems(List<Item> unplacedItems, SortedList<Location, Item> world)

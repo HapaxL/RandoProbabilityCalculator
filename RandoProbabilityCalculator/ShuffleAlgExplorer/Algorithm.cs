@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace RandoProbabilityCalculator.ShuffleAlgExplorer
@@ -8,18 +9,39 @@ namespace RandoProbabilityCalculator.ShuffleAlgExplorer
     {
         public abstract Dictionary<string, long> Shuffle(Outcome world);
 
-        public void CompileOutcome(int count, Dictionary<string, long> compiled, Outcome outcome)
+        public Dictionary<string, long> CompileOutcomes(IEnumerable<Dictionary<string, long>> compileds)
         {
-            var s = outcome.GetWorldString(count);
+            if (compileds.Count() == 0)
+            {
+                return CompileSingleOutcome(0, new FailedOutcome());
+            }
 
-            if (compiled.ContainsKey(s))
+            var totals = compileds.ToDictionary(c => c, c => c.Values.Sum());
+            var lcm = HapaxTools.Math.LeastCommonMultiple(totals.Values.ToList());
+
+            var allCompiled = new Dictionary<string, long>();
+
+            foreach (var compiled in compileds)
             {
-                compiled[s]++;
+                var total = totals[compiled];
+
+                foreach (var kvp in compiled)
+                {
+                    var oc = kvp.Key;
+                    var probaRate = kvp.Value * (lcm / total);
+
+                    if (allCompiled.ContainsKey(oc))
+                    {
+                        allCompiled[oc] += probaRate;
+                    }
+                    else
+                    {
+                        allCompiled.Add(oc, probaRate);
+                    }
+                }
             }
-            else
-            {
-                compiled.Add(s, 1);
-            }
+
+            return allCompiled;
         }
 
         public Dictionary<string, long> CompileSingleOutcome(int count, Outcome outcome)
