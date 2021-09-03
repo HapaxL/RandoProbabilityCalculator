@@ -9,16 +9,16 @@ namespace RandoProbabilityCalculator.ShuffleAlgExplorer
     {
         int ocCount = 0;
 
-        public override Dictionary<string, int> Shuffle(Outcome outcome)
+        public override Dictionary<string, long> Shuffle(Outcome outcome)
         {
             Console.WriteLine("starting random");
-            var compiled = new Dictionary<string, int>();
+            var compiled = new Dictionary<string, long>();
             Shuffle(compiled, 0, outcome);
             Console.WriteLine("ending random");
             return compiled;
         }
 
-        public void Shuffle(Dictionary<string, int> compiled, int curLoc, Outcome outcome)
+        public void Shuffle(Dictionary<string, long> compiled, int curLoc, Outcome outcome)
         {
             if (outcome.UnplacedItems.Count == 0 || outcome.EmptyLocations.Count == 0)
             {

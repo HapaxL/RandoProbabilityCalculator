@@ -9,16 +9,15 @@ namespace RandoProbabilityCalculator.ShuffleAlgExplorer
     {
         int ocCount = 0;
 
-        public override Dictionary<string, int> Shuffle(Outcome outcome)
+        public override Dictionary<string, long> Shuffle(Outcome outcome)
         {
             Console.WriteLine("starting assumed");
-            var compiled = new Dictionary<string, int>();
-            Shuffle(compiled, outcome);
+            var compiled = SubShuffle(outcome);
             Console.WriteLine("ending assumed");
             return compiled;
         }
 
-        public void Shuffle(Dictionary<string, int> compiled, Outcome outcome)
+        public Dictionary<string, long> SubShuffle(Outcome outcome)
         {
             // Console.WriteLine($"{outcome.UnplacedItems.Count} unplaced items");
 
@@ -26,13 +25,15 @@ namespace RandoProbabilityCalculator.ShuffleAlgExplorer
             {
                 ocCount++;
                 if (ocCount % 1000 == 0) Console.WriteLine(ocCount);
-                CompileOutcome(ocCount, compiled, outcome);
+                // CompileOutcome(ocCount, compiled, outcome);
                 //if (ocCount == 682922)
                 //{
                 //    Console.WriteLine("problematic");
                 //}
-                return;
+                return CompileSingleOutcome(ocCount, outcome);
             }
+
+            var compileds = new List<Dictionary<string, long>>();
 
             foreach (var item in outcome.UnplacedItems.Distinct())
             {
@@ -43,15 +44,44 @@ namespace RandoProbabilityCalculator.ShuffleAlgExplorer
 
                 if (reachableEmptyLocs.Count() == 0)
                 {
-                    CompileOutcome(ocCount, compiled, new FailedOutcome());
+                    var compiled = CompileSingleOutcome(ocCount, new FailedOutcome());
+                    compileds.Add(compiled);
                     continue;
                 }
 
                 foreach (var location in reachableEmptyLocs)
                 {
-                    Shuffle(compiled, outcome.WithItemInLocation(item, location));
+                    var compiled = SubShuffle(outcome.WithItemInLocation(item, location));
+                    compileds.Add(compiled);
                 }
             }
+
+            var totals = compileds.ToDictionary(c => c, c => c.Values.Sum());
+            var lcm = HapaxTools.Math.LeastCommonMultiple(totals.Values.ToList());
+
+            var allCompiled = new Dictionary<string, long>();
+
+            foreach (var compiled in compileds)
+            {
+                var total = totals[compiled];
+
+                foreach (var kvp in compiled)
+                {
+                    var oc = kvp.Key;
+                    var probaRate = kvp.Value * (lcm / total);
+
+                    if (allCompiled.ContainsKey(oc))
+                    {
+                        allCompiled[oc] += probaRate;
+                    }
+                    else
+                    {
+                        allCompiled.Add(oc, probaRate);
+                    }
+                }
+            }
+
+            return allCompiled;
         }
 
         public List<Item> FetchAllItems(List<Item> unplacedItems, SortedList<Location, Item> world)

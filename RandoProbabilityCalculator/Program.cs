@@ -100,7 +100,7 @@ namespace RandoProbabilityCalculator
                 new Item("x"),
                 new Item("x"),
                 new Item("x"),
-                new Item("x"),
+                // new Item("x"),
             };
             
             var reqA = new ItemReq(items[0]);
@@ -126,38 +126,56 @@ namespace RandoProbabilityCalculator
                 new Location(3, reqA),
                 new Location(4, reqA),
                 new Location(5, reqA),
-                new Location(6, reqA),
+                // new Location(6, reqA),
             };
 
             var oc = new Outcome(items, locations);
-            //var oc2= new Outcome(items, locations);
-            var oc3 = new Outcome(items, locations);
 
             var random = new RandomFill();
-            // var assumed = new AssumedFill();
-            var singleAdjusted = new AssumedFill_SingleItem_AdjustedCount();
+            var assumed = new AssumedFill();
+            // var singleAdjusted = new AssumedFill_SingleItem_AdjustedCount();
 
-            var sacompiled = singleAdjusted.Shuffle(oc3);
+            // var sacompiled = singleAdjusted.Shuffle(oc);
             var rcompiled = random.Shuffle(oc);
-            // var acompiled = assumed.Shuffle(oc2);
+            var acompiled = assumed.Shuffle(oc);
+
+            var failedOutcomeString = new FailedOutcome().GetWorldString(0);
 
             Console.WriteLine("Random:");
+            var rtotal = rcompiled.Values.Sum();
+            var rtotalSuccesses = rtotal - rcompiled[failedOutcomeString];
             foreach (var c in rcompiled)
             {
-                Console.WriteLine($"{c.Key}: {c.Value}");
+                if (c.Key == failedOutcomeString)
+                {
+                    Console.WriteLine($"{c.Key}: {c.Value} ({100.0 * c.Value / rtotal}% of total)");
+                }
+                else
+                {
+                    Console.WriteLine($"{c.Key}: {c.Value} ({100.0 * c.Value / rtotal}% of total, {100.0 * c.Value / rtotalSuccesses}% of successes)");
+                }
             }
 
-            //Console.WriteLine("Assumed:");
-            //foreach (var c in acompiled)
+            Console.WriteLine("Assumed:");
+            var atotal = acompiled.Values.Sum();
+            var atotalSuccesses = atotal - acompiled[failedOutcomeString];
+            foreach (var c in acompiled)
+            {
+                if (c.Key == failedOutcomeString)
+                {
+                    Console.WriteLine($"{c.Key}: {c.Value} ({100.0 * c.Value / atotal}% of total)");
+                }
+                else
+                {
+                    Console.WriteLine($"{c.Key}: {c.Value} ({100.0 * c.Value / atotal}% of total, {100.0 * c.Value / atotalSuccesses}% of successes)");
+                }
+            }
+
+            //Console.WriteLine("SingleItem Adjusted:");
+            //foreach (var c in sacompiled)
             //{
             //    Console.WriteLine($"{c.Key}: {c.Value}");
             //}
-
-            Console.WriteLine("SingleItem Adjusted:");
-            foreach (var c in sacompiled)
-            {
-                Console.WriteLine($"{c.Key}: {c.Value}");
-            }
         }
     }
 }
