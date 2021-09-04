@@ -48,10 +48,11 @@ namespace RandoProbabilityCalculator.ShuffleAlgExplorer
             var found = true;
             while(found)
             {
-                var newUnplaced = new List<Item>(unplaced);
                 found = false;
-                foreach (var item in newUnplaced)
+                foreach (var item in unplaced)
                 {
+                    var newUnplaced = new List<Item>(unplaced);
+                    newUnplaced.Remove(item);
                     var allItems = FetchAllItems(newUnplaced, newOutcome.World);
                     var reachable = newOutcome.EmptyLocations.Where(l => l.CanBeReachedWith(allItems)).ToList();
 
@@ -64,7 +65,7 @@ namespace RandoProbabilityCalculator.ShuffleAlgExplorer
                     {
                         found = true;
                         newOutcome = newOutcome.WithItemInLocation(item, reachable[0]);
-                        unplaced.Remove(item);
+                        unplaced = newUnplaced;
                         break;
                     }
                 }

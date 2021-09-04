@@ -92,16 +92,16 @@ namespace RandoProbabilityCalculator
 
             var items = new List<Item>
             {
-                //new Item("A"),
-                //new Item("B"),
-                //new Item("x"),
-                //new Item("x"),
-
                 new Item("A"),
                 new Item("B"),
                 new Item("x"),
                 new Item("x"),
-                new Item("x"),
+
+                //new Item("A"),
+                //new Item("B"),
+                //new Item("x"),
+                //new Item("x"),
+                //new Item("x"),
                 //new Item("x"),
                 // new Item("x"),
             };
@@ -113,13 +113,13 @@ namespace RandoProbabilityCalculator
             var reqX = new ReqOr(reqX1, reqX2);
             var req2X = new ReqAnd(reqX1, reqX2);
 
-            //var locations = new List<Location>
-            //{
-            //    new Location(0, ReqExpr.None),
-            //    new Location(1, reqX),
-            //    new Location(2, new ReqOr(reqA, new ReqAnd(reqB, reqX))),
-            //    new Location(3, new ReqOr(new ReqAnd(reqA, req2X), new ReqAnd(reqB, reqX), new ReqAnd(reqA, reqB))),
-            //};
+            var locations = new List<Location>
+            {
+                new Location(0, ReqExpr.None),
+                new Location(1, reqX),
+                new Location(2, new ReqOr(reqA, new ReqAnd(reqB, reqX))),
+                new Location(3, new ReqOr(new ReqAnd(reqA, req2X), new ReqAnd(reqB, reqX), new ReqAnd(reqA, reqB))),
+            };
 
             //var locations = new List<Location>
             //{
@@ -132,16 +132,16 @@ namespace RandoProbabilityCalculator
             //    // new Location(6, reqA),
             //};
 
-            var locations = new List<Location>
-            {
-                new Location(0, ReqExpr.None),
-                new Location(1, reqA),
-                new Location(2, reqA),
-                new Location(3, reqA),
-                new Location(4, reqA),
-                //new Location(5, reqA),
-                // new Location(6, reqA),
-            };
+            //var locations = new List<Location>
+            //{
+            //    new Location(0, ReqExpr.None),
+            //    new Location(1, reqA),
+            //    new Location(2, reqA),
+            //    new Location(3, reqA),
+            //    new Location(4, reqA),
+            //    //new Location(5, reqA),
+            //    // new Location(6, reqA),
+            //};
 
             var oc = new Outcome(items, locations);
 
