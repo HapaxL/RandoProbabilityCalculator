@@ -41,7 +41,7 @@ namespace RandoProbabilityCalculator.ShuffleAlgExplorer
         {
             if (compileds.Count() == 0)
             {
-                return CompileSingleOutcome(0, Outcome.Failed, new Dictionary<Item, long>());
+                return CompileSingleOutcome(0, Outcome.Failed, new Dictionary<string, long> { { "???", 1 } });
             }
 
             var totals = compileds.ToDictionary(c => c, c => c.Values.Select(co => co.Proportion).Sum());

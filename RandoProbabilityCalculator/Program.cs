@@ -92,16 +92,16 @@ namespace RandoProbabilityCalculator
 
             var items = new List<Item>
             {
-                new Item("A"),
-                new Item("B"),
-                new Item("x"),
-                new Item("x"),
-
                 //new Item("A"),
                 //new Item("B"),
                 //new Item("x"),
                 //new Item("x"),
-                //new Item("x"),
+
+                new Item("A"),
+                new Item("B"),
+                new Item("x"),
+                new Item("x"),
+                new Item("x"),
                 //new Item("x"),
                 // new Item("x"),
             };
@@ -113,13 +113,13 @@ namespace RandoProbabilityCalculator
             var reqX = new ReqOr(reqX1, reqX2);
             var req2X = new ReqAnd(reqX1, reqX2);
 
-            var locations = new List<Location>
-            {
-                new Location(0, ReqExpr.None),
-                new Location(1, reqX),
-                new Location(2, new ReqOr(reqA, new ReqAnd(reqB, reqX))),
-                new Location(3, new ReqOr(new ReqAnd(reqA, req2X), new ReqAnd(reqB, reqX), new ReqAnd(reqA, reqB))),
-            };
+            //var locations = new List<Location>
+            //{
+            //    new Location(0, ReqExpr.None),
+            //    new Location(1, reqX),
+            //    new Location(2, new ReqOr(reqA, new ReqAnd(reqB, reqX))),
+            //    new Location(3, new ReqOr(new ReqAnd(reqA, req2X), new ReqAnd(reqB, reqX), new ReqAnd(reqA, reqB))),
+            //};
 
             //var locations = new List<Location>
             //{
@@ -131,6 +131,17 @@ namespace RandoProbabilityCalculator
             //    new Location(5, reqA),
             //    // new Location(6, reqA),
             //};
+
+            var locations = new List<Location>
+            {
+                new Location(0, ReqExpr.None),
+                new Location(1, reqA),
+                new Location(2, reqA),
+                new Location(3, reqA),
+                new Location(4, reqA),
+                //new Location(5, reqA),
+                // new Location(6, reqA),
+            };
 
             var oc = new Outcome(items, locations);
 
@@ -149,7 +160,7 @@ namespace RandoProbabilityCalculator
             //Console.WriteLine();
             //Console.WriteLine("Random:");
             //var rtotal = rcompiled.Values.Sum();
-            //var rtotalSuccesses = rtotal - rcompiled[failedOutcomeString];
+            // var rtotalSuccesses = rcompiled.ContainsKey(failedOutcomeString) ? rtotal - rcompiled[failedOutcomeString].Value : rtotal;
             //foreach (var c in rcompiled)
             //{
             //    if (c.Key == failedOutcomeString)
@@ -165,7 +176,7 @@ namespace RandoProbabilityCalculator
             Console.WriteLine();
             Console.WriteLine("AssumedExplorer:");
             var aetotal = aecompiled.Values.Select(kvp => kvp.Value).Sum();
-            var aetotalSuccesses = aetotal - aecompiled[failedOutcomeString].Value;
+            var aetotalSuccesses = aecompiled.ContainsKey(failedOutcomeString) ? aetotal - aecompiled[failedOutcomeString].Value : aetotal;
             foreach (var c in aecompiled)
             {
                 if (c.Key == failedOutcomeString)
@@ -181,7 +192,7 @@ namespace RandoProbabilityCalculator
             Console.WriteLine();
             Console.WriteLine("Assumed:");
             var atotal = acompiled.Values.Select(kvp => kvp.Proportion).Sum();
-            var atotalSuccesses = atotal - acompiled[failedOutcomeString].Proportion;
+            var atotalSuccesses = acompiled.ContainsKey(failedOutcomeString) ? atotal - acompiled[failedOutcomeString].Proportion : atotal;
             foreach (var c in acompiled)
             {
                 if (c.Key == failedOutcomeString)
@@ -189,7 +200,7 @@ namespace RandoProbabilityCalculator
                     Console.WriteLine($"{c.Key}: ({c.Value.Count}) {c.Value.Proportion} ({100.0 * c.Value.Proportion / atotal}% of total)");
                     //foreach (var parent in c.Value.Parents)
                     //{
-                    //    Console.WriteLine($"    {parent.Key}: {parent.Value}");
+                    //    Console.WriteLine($"    {parent.Key}: {parent.Value} ({100.0 * parent.Value / atotal}% of total, {100.0 * parent.Value / atotalSuccesses}% of successes)");
                     //}
                 }
                 else
@@ -197,7 +208,7 @@ namespace RandoProbabilityCalculator
                     Console.WriteLine($"{c.Key}: ({c.Value.Count}) {c.Value.Proportion} ({100.0 * c.Value.Proportion / atotal}% of total, {100.0 * c.Value.Proportion / atotalSuccesses}% of successes)");
                     //foreach (var parent in c.Value.Parents)
                     //{
-                    //    Console.WriteLine($"    {parent.Key}: {parent.Value}");
+                    //    Console.WriteLine($"    {parent.Key}: {parent.Value} ({100.0 * parent.Value / atotal}% of total, {100.0 * parent.Value / atotalSuccesses}% of successes)");
                     //}
                 }
             }
@@ -205,7 +216,7 @@ namespace RandoProbabilityCalculator
             Console.WriteLine();
             Console.WriteLine("Assumed SingleItem:");
             var stotal = scompiled.Values.Select(kvp => kvp.Proportion).Sum();
-            var stotalSuccesses = stotal - scompiled[failedOutcomeString].Proportion;
+            var stotalSuccesses = scompiled.ContainsKey(failedOutcomeString) ? stotal - scompiled[failedOutcomeString].Proportion : stotal;
             foreach (var c in scompiled)
             {
                 if (c.Key == failedOutcomeString)
