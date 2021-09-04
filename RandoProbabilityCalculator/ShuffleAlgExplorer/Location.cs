@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 
+using Item = System.String;
+
 namespace RandoProbabilityCalculator.ShuffleAlgExplorer
 {
     public class Location : IComparable<Location>

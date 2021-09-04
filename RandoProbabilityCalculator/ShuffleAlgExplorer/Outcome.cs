@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
+using Item = System.String;
+
 namespace RandoProbabilityCalculator.ShuffleAlgExplorer
 {
     public class Outcome
@@ -88,7 +90,14 @@ namespace RandoProbabilityCalculator.ShuffleAlgExplorer
             var sb = new StringBuilder("<");
             foreach (var kvp in World)
             {
-                sb.Append(kvp.Value.Name);
+                if (kvp.Value == null)
+                {
+                    sb.Append("_");
+                }
+                else
+                {
+                    sb.Append(kvp.Value);
+                }
             }
             sb.Append(">");
             return sb.ToString();
@@ -98,6 +107,8 @@ namespace RandoProbabilityCalculator.ShuffleAlgExplorer
         {
             return GetWorldString(0);
         }
+
+        public static FailedOutcome Failed = new FailedOutcome();
     }
 
     public class FailedOutcome : Outcome

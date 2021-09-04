@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
+using Item = System.String;
+
 namespace RandoProbabilityCalculator.ShuffleAlgExplorer
 {
     public abstract class ReqExpr

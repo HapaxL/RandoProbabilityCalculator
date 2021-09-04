@@ -3,25 +3,34 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
+using Item = System.String;
+
 namespace RandoProbabilityCalculator.ShuffleAlgExplorer
 {
     public class AssumedFill_SingleItem : Algorithm
     {
         int ocCount = 0;
 
-        public override Dictionary<string, long> Shuffle(Outcome outcome)
+        public override Dictionary<string, CompiledResult> Shuffle(Outcome outcome)
         {
             Console.WriteLine("starting singleitem");
-            var compiled = SubShuffle(outcome);
+            var perms = GetPermutations(outcome.UnplacedItems);
+
+            var compileds = new List<Dictionary<string, CompiledResult>>();
+            foreach (var perm in perms)
+            {
+                var compiled = SubShuffle(outcome, perm, outcome.GetWorldString(0));
+                compileds.Add(compiled);
+            }
             Console.WriteLine("ending singleitem");
-            return compiled;
+            return CompileOutcomes(compileds);
         }
 
-        public Dictionary<string, long> SubShuffle(Outcome outcome)
+        public Dictionary<string, CompiledResult> SubShuffle(Outcome outcome, List<Item> permutation, string parent)
         {
             // Console.WriteLine($"{outcome.UnplacedItems.Count} unplaced items");
-            
-            if (outcome.UnplacedItems.Count == 0 || outcome.EmptyLocations.Count == 0)
+
+            if (permutation.Count == 0 || outcome.EmptyLocations.Count == 0)
             {
                 ocCount++;
                 if (ocCount % 1000 == 0) Console.WriteLine(ocCount);
@@ -30,51 +39,67 @@ namespace RandoProbabilityCalculator.ShuffleAlgExplorer
                 //{
                 //    Console.WriteLine("problematic");
                 //}
-                return CompileSingleOutcome(ocCount, outcome);
+                return CompileSingleOutcome(ocCount, outcome, new Dictionary<string, long> { { parent, 1 } });
             }
 
-            var compileds = new List<Dictionary<string, long>>();
-
-            var reachableResults = new Dictionary<Item, List<Location>>();
-
+            var compileds = new List<Dictionary<string, CompiledResult>>();
             var newOutcome = outcome;
-
-            foreach (var item in newOutcome.UnplacedItems.Distinct())
+            var unplaced = new List<Item>(permutation);
+            var found = true;
+            while(found)
             {
-                var unplaced = new List<Item>(newOutcome.UnplacedItems);
-                unplaced.Remove(item);
-                var allItems = FetchAllItems(unplaced, newOutcome.World);
-                var reachable = newOutcome.EmptyLocations.Where(l => l.CanBeReachedWith(allItems)).ToList();
-
-                if (reachable.Count == 1)
+                var newUnplaced = new List<Item>(unplaced);
+                found = false;
+                foreach (var item in newUnplaced)
                 {
-                    newOutcome = newOutcome.WithItemInLocation(item, reachable[0]);
-                    foreach (var kvp in reachableResults)
+                    var allItems = FetchAllItems(newUnplaced, newOutcome.World);
+                    var reachable = newOutcome.EmptyLocations.Where(l => l.CanBeReachedWith(allItems)).ToList();
+
+                    if (reachable.Count == 0)
                     {
-                        kvp.Value.Remove(reachable[0]);
+                        var compiled = CompileSingleOutcome(0, Outcome.Failed, new Dictionary<string, long> { { parent, 1 } });
+                        return compiled;
+                    }
+                    else if (reachable.Count == 1)
+                    {
+                        found = true;
+                        newOutcome = newOutcome.WithItemInLocation(item, reachable[0]);
+                        unplaced.Remove(item);
+                        break;
                     }
                 }
-
-                reachableResults.Add(item, reachable);
             }
 
-            foreach (var result in reachableResults)
+            if (unplaced.Count == 0)
             {
-                if (result.Value.Count == 0)
+                if (newOutcome.IsCompletable())
                 {
-                    CompileSingleOutcome(0, new FailedOutcome());
-                    continue;
-                }
-                else if (result.Value.Count == 1)
-                {
-                    var compiled = SubShuffle(newOutcome);
+                    var compiled = SubShuffle(newOutcome, unplaced, newOutcome.GetWorldString(ocCount));
                     compileds.Add(compiled);
                 }
                 else
                 {
-                    foreach (var location in result.Value)
+                    var compiled = CompileSingleOutcome(0, Outcome.Failed, new Dictionary<string, long> { { parent, 1 } });
+                    return compiled;
+                }
+            }
+            else
+            {
+                var item1 = unplaced[0];
+                var newUnplaced1 = unplaced.Skip(1).ToList();
+                var allItems1 = FetchAllItems(newUnplaced1, newOutcome.World);
+                var reachableEmptyLocs = newOutcome.EmptyLocations.Where(l => l.CanBeReachedWith(allItems1));
+
+                if (reachableEmptyLocs.Count() == 0)
+                {
+                    var compiled = CompileSingleOutcome(0, Outcome.Failed, new Dictionary<string, long> { { parent, 1 } });
+                    return compiled;
+                }
+                else
+                {
+                    foreach (var location in reachableEmptyLocs)
                     {
-                        var compiled = SubShuffle(newOutcome.WithItemInLocation(result.Key, location));
+                        var compiled = SubShuffle(newOutcome.WithItemInLocation(item1, location), new List<Item>(newUnplaced1), newOutcome.GetWorldString(ocCount));
                         compileds.Add(compiled);
                     }
                 }

@@ -2,96 +2,87 @@
 //using System.Collections.Generic;
 //using System.Linq;
 //using System.Text;
-//using HapaxTools;
+
+//using Item = System.String;
 
 //namespace RandoProbabilityCalculator.ShuffleAlgExplorer
 //{
-//    public class AssumedFill_MultipleItem : Algorithm
+//    public class AssumedFillExplorer_SingleItem : AlgorithmExplorer
 //    {
 //        int ocCount = 0;
 
-//        public override Dictionary<string, int> Shuffle(Outcome outcome)
+//        public override Dictionary<string, long> Shuffle(Outcome outcome)
 //        {
 //            Console.WriteLine("starting singleitem");
-//            var compiled = new Dictionary<string, int>();
-//            Shuffle(compiled, outcome, new List<Item>());
+//            var compiled = SubShuffle(outcome);
 //            Console.WriteLine("ending singleitem");
 //            return compiled;
 //        }
 
-//        public void Shuffle(Dictionary<string, int> compiled, Outcome outcome, IEnumerable<Item> PriorityQueue)
+//        public Dictionary<string, long> SubShuffle(Outcome outcome)
 //        {
 //            // Console.WriteLine($"{outcome.UnplacedItems.Count} unplaced items");
-
+            
 //            if (outcome.UnplacedItems.Count == 0 || outcome.EmptyLocations.Count == 0)
 //            {
 //                ocCount++;
 //                if (ocCount % 1000 == 0) Console.WriteLine(ocCount);
-//                CompileOutcome(ocCount, compiled, outcome);
+//                // CompileOutcome(ocCount, compiled, outcome);
 //                //if (ocCount == 682922)
 //                //{
 //                //    Console.WriteLine("problematic");
 //                //}
-//                return;
+//                return CompileSingleOutcome(ocCount, outcome);
 //            }
+
+//            var compileds = new List<Dictionary<string, long>>();
 
 //            var reachableResults = new Dictionary<Item, List<Location>>();
 
 //            var newOutcome = outcome;
 
-//            IEnumerable<Item> toPlace;
-
-//            if (PriorityQueue.Count() == 0)
+//            foreach (var item in newOutcome.UnplacedItems.Distinct())
 //            {
-//                toPlace = newOutcome.UnplacedItems;
-//            }
-//            else
-//            {
-//                toPlace = PriorityQueue;
-//            }
-            
-//            foreach (var item in toPlace.Distinct())
-//            {
-//                var unplaced = new List<Item>(toPlace);
+//                var unplaced = new List<Item>(newOutcome.UnplacedItems);
 //                unplaced.Remove(item);
 //                var allItems = FetchAllItems(unplaced, newOutcome.World);
 //                var reachable = newOutcome.EmptyLocations.Where(l => l.CanBeReachedWith(allItems)).ToList();
-//                reachableResults.Add(item, reachable);
-//            }
 
-//            var resultSet = reachableResults.ToHashSet();
-//            var resultSubsets = resultSet.Powerset()
-//                .Where(s => s.Count > 0)
-//                .OrderBy(s => s.Count)
-//                .Select(s => new KeyValuePair<IEnumerable<Item>, ISet<Location>>(
-//                    s.Select(kvp => kvp.Key),
-//                    s.SelectMany(kvp => kvp.Value).ToHashSet()));
-            
-//            var first = resultSubsets.FirstOrDefault(subset => subset.Key.Count() == subset.Value.Count);
-//            if (!first.Equals(default(KeyValuePair<IEnumerable<Item>, ISet<Location>>)))
-//            {
-//                Shuffle(compiled, outcome, PriorityQueue.Concat(first.Key));
+//                if (reachable.Count == 1)
+//                {
+//                    newOutcome = newOutcome.WithItemInLocation(item, reachable[0]);
+//                    foreach (var kvp in reachableResults)
+//                    {
+//                        kvp.Value.Remove(reachable[0]);
+//                    }
+//                }
+
+//                reachableResults.Add(item, reachable);
 //            }
 
 //            foreach (var result in reachableResults)
 //            {
 //                if (result.Value.Count == 0)
 //                {
-//                    CompileOutcome(0, compiled, new FailedOutcome());
+//                    CompileSingleOutcome(0, new FailedOutcome());
 //                    continue;
 //                }
 //                else if (result.Value.Count == 1)
 //                {
-//                    Shuffle(compiled, newOutcome);
+//                    var compiled = SubShuffle(newOutcome);
+//                    compileds.Add(compiled);
 //                }
 //                else
 //                {
 //                    foreach (var location in result.Value)
 //                    {
-//                        Shuffle(compiled, newOutcome.WithItemInLocation(result.Key, location));
+//                        var compiled = SubShuffle(newOutcome.WithItemInLocation(result.Key, location));
+//                        compileds.Add(compiled);
 //                    }
 //                }
 //            }
+
+//            return CompileOutcomes(compileds);
 //        }
 
 //        public List<Item> FetchAllItems(List<Item> unplacedItems, SortedList<Location, Item> world)

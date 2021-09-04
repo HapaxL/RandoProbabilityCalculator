@@ -2,6 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+
+using Item = System.String;
 
 namespace RandoProbabilityCalculator
 {
@@ -89,102 +92,133 @@ namespace RandoProbabilityCalculator
 
             var items = new List<Item>
             {
-                //new Item("A"),
-                //new Item("B"),
-                //new Item("x"),
-                //new Item("x"),
-                
                 new Item("A"),
                 new Item("B"),
                 new Item("x"),
                 new Item("x"),
-                new Item("x"),
-                new Item("x"),
+
+                //new Item("A"),
+                //new Item("B"),
+                //new Item("x"),
+                //new Item("x"),
+                //new Item("x"),
+                //new Item("x"),
                 // new Item("x"),
             };
             
             var reqA = new ItemReq(items[0]);
             var reqB = new ItemReq(items[1]);
-            //var reqX1 = new ItemReq(items[2]);
-            //var reqX2 = new ItemReq(items[3]);
-            //var reqX = new ReqOr(reqX1, reqX2);
-            //var req2X = new ReqAnd(reqX1, reqX2);
-
-            //var locations = new List<Location>
-            //{
-            //    new Location(0, ReqExpr.None),
-            //    new Location(1, reqX),
-            //    new Location(2, new ReqOr(reqA, new ReqAnd(reqB, reqX))),
-            //    new Location(3, new ReqOr(new ReqAnd(reqA, req2X), new ReqAnd(reqB, reqX), new ReqAnd(reqA, reqB))),
-            //};
+            var reqX1 = new ItemReq(items[2]);
+            var reqX2 = new ItemReq(items[3]);
+            var reqX = new ReqOr(reqX1, reqX2);
+            var req2X = new ReqAnd(reqX1, reqX2);
 
             var locations = new List<Location>
             {
                 new Location(0, ReqExpr.None),
-                new Location(1, reqB),
-                new Location(2, reqA),
-                new Location(3, reqA),
-                new Location(4, reqA),
-                new Location(5, reqA),
-                // new Location(6, reqA),
+                new Location(1, reqX),
+                new Location(2, new ReqOr(reqA, new ReqAnd(reqB, reqX))),
+                new Location(3, new ReqOr(new ReqAnd(reqA, req2X), new ReqAnd(reqB, reqX), new ReqAnd(reqA, reqB))),
             };
+
+            //var locations = new List<Location>
+            //{
+            //    new Location(0, ReqExpr.None),
+            //    new Location(1, reqB),
+            //    new Location(2, reqA),
+            //    new Location(3, reqA),
+            //    new Location(4, reqA),
+            //    new Location(5, reqA),
+            //    // new Location(6, reqA),
+            //};
 
             var oc = new Outcome(items, locations);
 
-            var random = new RandomFill();
+            //var random = new RandomFill();
+            var assumedE = new AssumedFillExplorer();
             var assumed = new AssumedFill();
             var single = new AssumedFill_SingleItem();
 
-            var rcompiled = random.Shuffle(oc);
+            //var rcompiled = random.Shuffle(oc);
+            var aecompiled = assumedE.Shuffle(oc);
             var acompiled = assumed.Shuffle(oc);
             var scompiled = single.Shuffle(oc);
 
-            var failedOutcomeString = new FailedOutcome().GetWorldString(0);
+            var failedOutcomeString = Outcome.Failed.GetWorldString(0);
 
-            Console.WriteLine("Random:");
-            var rtotal = rcompiled.Values.Sum();
-            var rtotalSuccesses = rtotal - rcompiled[failedOutcomeString];
-            foreach (var c in rcompiled)
+            //Console.WriteLine();
+            //Console.WriteLine("Random:");
+            //var rtotal = rcompiled.Values.Sum();
+            //var rtotalSuccesses = rtotal - rcompiled[failedOutcomeString];
+            //foreach (var c in rcompiled)
+            //{
+            //    if (c.Key == failedOutcomeString)
+            //    {
+            //        Console.WriteLine($"{c.Key}: {c.Value} ({100.0 * c.Value / rtotal}% of total)");
+            //    }
+            //    else
+            //    {
+            //        Console.WriteLine($"{c.Key}: {c.Value} ({100.0 * c.Value / rtotal}% of total, {100.0 * c.Value / rtotalSuccesses}% of successes)");
+            //    }
+            //}
+
+            Console.WriteLine();
+            Console.WriteLine("AssumedExplorer:");
+            var aetotal = aecompiled.Values.Select(kvp => kvp.Value).Sum();
+            var aetotalSuccesses = aetotal - aecompiled[failedOutcomeString].Value;
+            foreach (var c in aecompiled)
             {
                 if (c.Key == failedOutcomeString)
                 {
-                    Console.WriteLine($"{c.Key}: {c.Value} ({100.0 * c.Value / rtotal}% of total)");
+                    Console.WriteLine($"{c.Key}: ({c.Value.Key}) {c.Value.Value} ({100.0 * c.Value.Value / aetotal}% of total)");
                 }
                 else
                 {
-                    Console.WriteLine($"{c.Key}: {c.Value} ({100.0 * c.Value / rtotal}% of total, {100.0 * c.Value / rtotalSuccesses}% of successes)");
+                    Console.WriteLine($"{c.Key}: ({c.Value.Key}) {c.Value.Value} ({100.0 * c.Value.Value / aetotal}% of total, {100.0 * c.Value.Value / aetotalSuccesses}% of successes)");
                 }
             }
 
+            Console.WriteLine();
             Console.WriteLine("Assumed:");
-            var atotal = acompiled.Values.Sum();
-            var atotalSuccesses = atotal - acompiled[failedOutcomeString];
+            var atotal = acompiled.Values.Select(kvp => kvp.Proportion).Sum();
+            var atotalSuccesses = atotal - acompiled[failedOutcomeString].Proportion;
             foreach (var c in acompiled)
             {
                 if (c.Key == failedOutcomeString)
                 {
-                    Console.WriteLine($"{c.Key}: {c.Value} ({100.0 * c.Value / atotal}% of total)");
+                    Console.WriteLine($"{c.Key}: ({c.Value.Count}) {c.Value.Proportion} ({100.0 * c.Value.Proportion / atotal}% of total)");
+                    //foreach (var parent in c.Value.Parents)
+                    //{
+                    //    Console.WriteLine($"    {parent.Key}: {parent.Value}");
+                    //}
                 }
                 else
                 {
-                    Console.WriteLine($"{c.Key}: {c.Value} ({100.0 * c.Value / atotal}% of total, {100.0 * c.Value / atotalSuccesses}% of successes)");
+                    Console.WriteLine($"{c.Key}: ({c.Value.Count}) {c.Value.Proportion} ({100.0 * c.Value.Proportion / atotal}% of total, {100.0 * c.Value.Proportion / atotalSuccesses}% of successes)");
+                    //foreach (var parent in c.Value.Parents)
+                    //{
+                    //    Console.WriteLine($"    {parent.Key}: {parent.Value}");
+                    //}
                 }
             }
 
-            Console.WriteLine("SingleItem:");
-            var stotal = scompiled.Values.Sum();
-            var stotalSuccesses = stotal - scompiled[failedOutcomeString];
+            Console.WriteLine();
+            Console.WriteLine("Assumed SingleItem:");
+            var stotal = scompiled.Values.Select(kvp => kvp.Proportion).Sum();
+            var stotalSuccesses = stotal - scompiled[failedOutcomeString].Proportion;
             foreach (var c in scompiled)
             {
                 if (c.Key == failedOutcomeString)
                 {
-                    Console.WriteLine($"{c.Key}: {c.Value} ({100.0 * c.Value / stotal}% of total)");
+                    Console.WriteLine($"{c.Key}: ({c.Value.Count}) {c.Value.Proportion} ({100.0 * c.Value.Proportion / stotal}% of total)");
                 }
                 else
                 {
-                    Console.WriteLine($"{c.Key}: {c.Value} ({100.0 * c.Value / stotal}% of total, {100.0 * c.Value / stotalSuccesses}% of successes)");
+                    Console.WriteLine($"{c.Key}: ({c.Value.Count}) {c.Value.Proportion} ({100.0 * c.Value.Proportion / stotal}% of total, {100.0 * c.Value.Proportion / stotalSuccesses}% of successes)");
                 }
             }
+
+            Console.WriteLine();
         }
     }
 }
