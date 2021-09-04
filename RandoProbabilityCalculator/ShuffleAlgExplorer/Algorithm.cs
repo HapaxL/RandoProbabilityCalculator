@@ -61,21 +61,25 @@ namespace RandoProbabilityCalculator.ShuffleAlgExplorer
 
                     if (allCompiled.ContainsKey(oc))
                     {
-                        var newParents = new Dictionary<string, long>(allCompiled[oc].Parents);
+                        Dictionary<Item, long> newParents = null;
+                        if (allCompiled[oc].Parents != null) {
+                            newParents = new Dictionary<string, long>(allCompiled[oc].Parents);
 
-                        foreach (var parent in kvp.Value.Parents)
-                        {
-                            var parentProbaRate = parent.Value * (lcm / total);
+                            foreach (var parent in kvp.Value.Parents)
+                            {
+                                var parentProbaRate = parent.Value * (lcm / total);
 
-                            if (newParents.ContainsKey(parent.Key))
-                            {
-                                newParents[parent.Key] += parentProbaRate;
-                            }
-                            else
-                            {
-                                newParents.Add(parent.Key, parentProbaRate);
+                                if (newParents.ContainsKey(parent.Key))
+                                {
+                                    newParents[parent.Key] += parentProbaRate;
+                                }
+                                else
+                                {
+                                    newParents.Add(parent.Key, parentProbaRate);
+                                }
                             }
                         }
+                        
 
                         allCompiled[oc] = new CompiledResult(allCompiled[oc].Count + count, allCompiled[oc].Proportion + probaRate, newParents);
                     }
@@ -93,6 +97,33 @@ namespace RandoProbabilityCalculator.ShuffleAlgExplorer
         {
             var s = outcome.GetWorldString(count);
             return new Dictionary<string, CompiledResult>() { { s, new CompiledResult(1, 1, parents) } };
+        }
+
+        public static Dictionary<string, CompiledResult> CompileSingleOutcome(int count, Outcome outcome)
+        {
+            return CompileSingleOutcome(count, outcome, default);
+        }
+
+        public static void PrintResults(string name, Dictionary<string, CompiledResult> compiled)
+        {
+            Console.WriteLine();
+            Console.WriteLine(name);
+
+            var failedOutcomeString = Outcome.Failed.GetWorldString(0);
+            var total = compiled.Values.Select(kvp => kvp.Proportion).Sum();
+            var totalSuccesses = compiled.ContainsKey(failedOutcomeString) ? (total - compiled[failedOutcomeString].Proportion) : total;
+
+            foreach (var c in compiled)
+            {
+                if (c.Key == failedOutcomeString)
+                {
+                    Console.WriteLine($"{c.Key}: ({c.Value.Count}) {c.Value.Proportion} ({100.0 * c.Value.Proportion / total}% of total)");
+                }
+                else
+                {
+                    Console.WriteLine($"{c.Key}: ({c.Value.Count}) {c.Value.Proportion} ({100.0 * c.Value.Proportion / total}% of total, {100.0 * c.Value.Proportion / totalSuccesses}% of successes)");
+                }
+            }
         }
     }
 }

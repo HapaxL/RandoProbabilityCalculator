@@ -13,7 +13,7 @@ namespace RandoProbabilityCalculator.ShuffleAlgExplorer
 
         public override Dictionary<string, CompiledResult> Shuffle(Outcome outcome)
         {
-            Console.WriteLine("starting singleitem");
+            Console.WriteLine("starting singleitem new");
             var perms = GetPermutations(outcome.UnplacedItems);
 
             var compileds = new List<Dictionary<string, CompiledResult>>();
@@ -22,7 +22,7 @@ namespace RandoProbabilityCalculator.ShuffleAlgExplorer
                 var compiled = SubShuffle(outcome, perm, outcome.GetWorldString(0));
                 compileds.Add(compiled);
             }
-            Console.WriteLine("ending singleitem");
+            Console.WriteLine("ending singleitem new");
             return CompileOutcomes(compileds);
         }
 
