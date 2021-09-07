@@ -51,7 +51,7 @@ namespace RandoProbabilityCalculator.ShuffleAlgExplorer
 
             if (reachableEmptyLocs.Count() == 0)
             {
-                var compiled = CompileSingleOutcome(ocCount, Outcome.Failed, new Dictionary<string, long> { { parent, 1 } });
+                var compiled = CompileSingleOutcome(ocCount, Outcome.Failed, new Dictionary<string, long> { { outcome.GetWorldString(0), 1 } });
                 return compiled;
             }
 
