@@ -59,29 +59,38 @@ namespace RandoProbabilityCalculator.ShuffleAlgExplorer
                     var count = kvp.Value.Count;
                     var probaRate = kvp.Value.Proportion * (lcm / total);
 
+                    Dictionary<string, long> newParents;
+
                     if (allCompiled.ContainsKey(oc))
                     {
-                        var newParents = new Dictionary<string, long>(allCompiled[oc].Parents);
+                        newParents = new Dictionary<string, long>(allCompiled[oc].Parents);
+                    }
+                    else
+                    {
+                        newParents = new Dictionary<string, long>();
+                    }
 
-                        foreach (var parent in kvp.Value.Parents)
+                    foreach (var parent in kvp.Value.Parents)
+                    {
+                        var parentProbaRate = parent.Value * (lcm / total);
+
+                        if (newParents.ContainsKey(parent.Key))
                         {
-                            var parentProbaRate = parent.Value * (lcm / total);
-
-                            if (newParents.ContainsKey(parent.Key))
-                            {
-                                newParents[parent.Key] += parentProbaRate;
-                            }
-                            else
-                            {
-                                newParents.Add(parent.Key, parentProbaRate);
-                            }
+                            newParents[parent.Key] += parentProbaRate;
                         }
+                        else
+                        {
+                            newParents.Add(parent.Key, parentProbaRate);
+                        }
+                    }
 
+                    if (allCompiled.ContainsKey(oc))
+                    {
                         allCompiled[oc] = new CompiledResult(allCompiled[oc].Count + count, allCompiled[oc].Proportion + probaRate, newParents);
                     }
                     else
                     {
-                        allCompiled.Add(oc, new CompiledResult(count, probaRate, kvp.Value.Parents));
+                        allCompiled.Add(oc, new CompiledResult(count, probaRate, newParents));
                     }
                 }
             }

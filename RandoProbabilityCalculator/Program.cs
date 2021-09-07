@@ -92,15 +92,15 @@ namespace RandoProbabilityCalculator
 
             var items = new List<Item>
             {
-                new Item("A"),
-                new Item("B"),
-                new Item("x"),
-                new Item("x"),
-
                 //new Item("A"),
                 //new Item("B"),
                 //new Item("x"),
                 //new Item("x"),
+
+                new Item("A"),
+                new Item("B"),
+                new Item("x"),
+                new Item("x"),
                 //new Item("x"),
                 //new Item("x"),
                 // new Item("x"),
@@ -113,24 +113,24 @@ namespace RandoProbabilityCalculator
             var reqX = new ReqOr(reqX1, reqX2);
             var req2X = new ReqAnd(reqX1, reqX2);
 
-            var locations = new List<Location>
-            {
-                new Location(0, ReqExpr.None),
-                new Location(1, reqX),
-                new Location(2, new ReqOr(reqA, new ReqAnd(reqB, reqX))),
-                new Location(3, new ReqOr(new ReqAnd(reqA, req2X), new ReqAnd(reqB, reqX), new ReqAnd(reqA, reqB))),
-            };
-
             //var locations = new List<Location>
             //{
             //    new Location(0, ReqExpr.None),
-            //    new Location(1, reqB),
-            //    new Location(2, reqA),
-            //    new Location(3, reqA),
-            //    new Location(4, reqA),
-            //    new Location(5, reqA),
-            //    // new Location(6, reqA),
+            //    new Location(1, reqX),
+            //    new Location(2, new ReqOr(reqA, new ReqAnd(reqB, reqX))),
+            //    new Location(3, new ReqOr(new ReqAnd(reqA, req2X), new ReqAnd(reqB, reqX), new ReqAnd(reqA, reqB))),
             //};
+
+            var locations = new List<Location>
+            {
+                new Location(0, ReqExpr.None),
+                new Location(1, reqB),
+                new Location(2, reqA),
+                new Location(3, reqA),
+                //new Location(4, reqA),
+                //new Location(5, reqA),
+                // new Location(6, reqA),
+            };
 
             //var locations = new List<Location>
             //{
@@ -198,18 +198,18 @@ namespace RandoProbabilityCalculator
                 if (c.Key == failedOutcomeString)
                 {
                     Console.WriteLine($"{c.Key}: ({c.Value.Count}) {c.Value.Proportion} ({100.0 * c.Value.Proportion / atotal}% of total)");
-                    //foreach (var parent in c.Value.Parents)
-                    //{
-                    //    Console.WriteLine($"    {parent.Key}: {parent.Value} ({100.0 * parent.Value / atotal}% of total, {100.0 * parent.Value / atotalSuccesses}% of successes)");
-                    //}
+                    foreach (var parent in c.Value.Parents)
+                    {
+                        Console.WriteLine($"    {parent.Key}: {parent.Value} ({100.0 * parent.Value / atotal}% of total, {100.0 * parent.Value / atotalSuccesses}% of successes)");
+                    }
                 }
                 else
                 {
                     Console.WriteLine($"{c.Key}: ({c.Value.Count}) {c.Value.Proportion} ({100.0 * c.Value.Proportion / atotal}% of total, {100.0 * c.Value.Proportion / atotalSuccesses}% of successes)");
-                    //foreach (var parent in c.Value.Parents)
-                    //{
-                    //    Console.WriteLine($"    {parent.Key}: {parent.Value} ({100.0 * parent.Value / atotal}% of total, {100.0 * parent.Value / atotalSuccesses}% of successes)");
-                    //}
+                    foreach (var parent in c.Value.Parents)
+                    {
+                        Console.WriteLine($"    {parent.Key}: {parent.Value} ({100.0 * parent.Value / atotal}% of total, {100.0 * parent.Value / atotalSuccesses}% of successes)");
+                    }
                 }
             }
 
