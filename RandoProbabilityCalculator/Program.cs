@@ -89,21 +89,16 @@ namespace RandoProbabilityCalculator
             //        new Area() { Req = 4, Checks = new int[] { 41, 42, 43, } },
             //    },
             //};
-
+          
             var items = new List<Item>
             {
-                //new Item("A"),
-                //new Item("B"),
-                //new Item("x"),
-                //new Item("x"),
-
                 new Item("A"),
                 new Item("B"),
                 new Item("x"),
                 new Item("x"),
-                //new Item("x"),
-                //new Item("x"),
                 // new Item("x"),
+                // new Item("x"),
+                // new item("x"),
             };
             
             var reqA = new ItemReq(items[0]);
@@ -145,90 +140,24 @@ namespace RandoProbabilityCalculator
 
             var oc = new Outcome(items, locations);
 
-            //var random = new RandomFill();
+            var random = new RandomFill();
             var assumedE = new AssumedFillExplorer();
             var assumed = new AssumedFill();
             var single = new AssumedFill_SingleItem();
+            var singleE = new AssumedFillExplorer_SingleItem();
 
-            //var rcompiled = random.Shuffle(oc);
+            var rcompiled = random.Shuffle(oc);
             var aecompiled = assumedE.Shuffle(oc);
             var acompiled = assumed.Shuffle(oc);
             var scompiled = single.Shuffle(oc);
+            var secompiled = singleE.Shuffle(oc);
 
-            var failedOutcomeString = Outcome.Failed.GetWorldString(0);
-
-            //Console.WriteLine();
-            //Console.WriteLine("Random:");
-            //var rtotal = rcompiled.Values.Sum();
-            // var rtotalSuccesses = rcompiled.ContainsKey(failedOutcomeString) ? rtotal - rcompiled[failedOutcomeString].Value : rtotal;
-            //foreach (var c in rcompiled)
-            //{
-            //    if (c.Key == failedOutcomeString)
-            //    {
-            //        Console.WriteLine($"{c.Key}: {c.Value} ({100.0 * c.Value / rtotal}% of total)");
-            //    }
-            //    else
-            //    {
-            //        Console.WriteLine($"{c.Key}: {c.Value} ({100.0 * c.Value / rtotal}% of total, {100.0 * c.Value / rtotalSuccesses}% of successes)");
-            //    }
-            //}
-
-            Console.WriteLine();
-            Console.WriteLine("AssumedExplorer:");
-            var aetotal = aecompiled.Values.Select(kvp => kvp.Value).Sum();
-            var aetotalSuccesses = aecompiled.ContainsKey(failedOutcomeString) ? aetotal - aecompiled[failedOutcomeString].Value : aetotal;
-            foreach (var c in aecompiled)
-            {
-                if (c.Key == failedOutcomeString)
-                {
-                    Console.WriteLine($"{c.Key}: ({c.Value.Key}) {c.Value.Value} ({100.0 * c.Value.Value / aetotal}% of total)");
-                }
-                else
-                {
-                    Console.WriteLine($"{c.Key}: ({c.Value.Key}) {c.Value.Value} ({100.0 * c.Value.Value / aetotal}% of total, {100.0 * c.Value.Value / aetotalSuccesses}% of successes)");
-                }
-            }
-
-            Console.WriteLine();
-            Console.WriteLine("Assumed:");
-            var atotal = acompiled.Values.Select(kvp => kvp.Proportion).Sum();
-            var atotalSuccesses = acompiled.ContainsKey(failedOutcomeString) ? atotal - acompiled[failedOutcomeString].Proportion : atotal;
-            foreach (var c in acompiled)
-            {
-                if (c.Key == failedOutcomeString)
-                {
-                    Console.WriteLine($"{c.Key}: ({c.Value.Count}) {c.Value.Proportion} ({100.0 * c.Value.Proportion / atotal}% of total)");
-                    foreach (var parent in c.Value.Parents)
-                    {
-                        Console.WriteLine($"    {parent.Key}: {parent.Value} ({100.0 * parent.Value / atotal}% of total, {100.0 * parent.Value / atotalSuccesses}% of successes)");
-                    }
-                }
-                else
-                {
-                    Console.WriteLine($"{c.Key}: ({c.Value.Count}) {c.Value.Proportion} ({100.0 * c.Value.Proportion / atotal}% of total, {100.0 * c.Value.Proportion / atotalSuccesses}% of successes)");
-                    foreach (var parent in c.Value.Parents)
-                    {
-                        Console.WriteLine($"    {parent.Key}: {parent.Value} ({100.0 * parent.Value / atotal}% of total, {100.0 * parent.Value / atotalSuccesses}% of successes)");
-                    }
-                }
-            }
-
-            Console.WriteLine();
-            Console.WriteLine("Assumed SingleItem:");
-            var stotal = scompiled.Values.Select(kvp => kvp.Proportion).Sum();
-            var stotalSuccesses = scompiled.ContainsKey(failedOutcomeString) ? stotal - scompiled[failedOutcomeString].Proportion : stotal;
-            foreach (var c in scompiled)
-            {
-                if (c.Key == failedOutcomeString)
-                {
-                    Console.WriteLine($"{c.Key}: ({c.Value.Count}) {c.Value.Proportion} ({100.0 * c.Value.Proportion / stotal}% of total)");
-                }
-                else
-                {
-                    Console.WriteLine($"{c.Key}: ({c.Value.Count}) {c.Value.Proportion} ({100.0 * c.Value.Proportion / stotal}% of total, {100.0 * c.Value.Proportion / stotalSuccesses}% of successes)");
-                }
-            }
-
+            Algorithm.PrintResults("Random:", rcompiled);
+            Algorithm.PrintResults("AssumedExplorer:", aecompiled);
+            Algorithm.PrintResults("Assumed:", acompiled);
+            Algorithm.PrintResults("Assumed SingleItem:", scompiled);
+            Algorithm.PrintResults("AssumedExplorer SingleItem:", secompiled);
+            
             Console.WriteLine();
         }
     }
