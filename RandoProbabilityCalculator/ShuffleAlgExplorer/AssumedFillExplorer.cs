@@ -7,11 +7,11 @@ using Item = System.String;
 
 namespace RandoProbabilityCalculator.ShuffleAlgExplorer
 {
-    public class AssumedFillExplorer : AlgorithmExplorer
+    public class AssumedFillExplorer : Algorithm
     {
         int ocCount = 0;
 
-        public override Dictionary<string, KeyValuePair<int, long>> Shuffle(Outcome outcome)
+        public override Dictionary<string, CompiledResult> Shuffle(Outcome outcome)
         {
             Console.WriteLine("starting assumed");
             var compiled = SubShuffle(outcome);
@@ -19,7 +19,7 @@ namespace RandoProbabilityCalculator.ShuffleAlgExplorer
             return compiled;
         }
 
-        public Dictionary<string, KeyValuePair<int, long>> SubShuffle(Outcome outcome)
+        public Dictionary<string, CompiledResult> SubShuffle(Outcome outcome)
         {
             // Console.WriteLine($"{outcome.UnplacedItems.Count} unplaced items");
 
@@ -35,7 +35,7 @@ namespace RandoProbabilityCalculator.ShuffleAlgExplorer
                 return CompileSingleOutcome(ocCount, outcome);
             }
 
-            var compileds = new List<Dictionary<string, KeyValuePair<int, long>>>();
+            var compileds = new List<Dictionary<string, CompiledResult>>();
 
             foreach (var item in outcome.UnplacedItems)
             {
