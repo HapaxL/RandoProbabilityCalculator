@@ -48,23 +48,24 @@ namespace RandoProbabilityCalculator.ShuffleAlgExplorer
             var found = true;
             while(found)
             {
-                var newUnplaced = new List<Item>(unplaced);
                 found = false;
-                foreach (var item in newUnplaced)
+                foreach (var item in unplaced)
                 {
+                    var newUnplaced = new List<Item>(unplaced);
+                    newUnplaced.Remove(item);
                     var allItems = FetchAllItems(newUnplaced, newOutcome.World);
                     var reachable = newOutcome.EmptyLocations.Where(l => l.CanBeReachedWith(allItems)).ToList();
 
                     if (reachable.Count == 0)
                     {
-                        var compiled = CompileSingleOutcome(0, Outcome.Failed, new Dictionary<string, long> { { parent, 1 } });
+                        var compiled = CompileSingleOutcome(ocCount, Outcome.Failed, new Dictionary<string, long> { { outcome.GetWorldString(ocCount), 1 } });
                         return compiled;
                     }
                     else if (reachable.Count == 1)
                     {
                         found = true;
                         newOutcome = newOutcome.WithItemInLocation(item, reachable[0]);
-                        unplaced.Remove(item);
+                        unplaced = newUnplaced;
                         break;
                     }
                 }
@@ -79,7 +80,7 @@ namespace RandoProbabilityCalculator.ShuffleAlgExplorer
                 }
                 else
                 {
-                    var compiled = CompileSingleOutcome(0, Outcome.Failed, new Dictionary<string, long> { { parent, 1 } });
+                    var compiled = CompileSingleOutcome(0, Outcome.Failed, new Dictionary<string, long> { { outcome.GetWorldString(ocCount), 1 } });
                     return compiled;
                 }
             }
@@ -92,7 +93,7 @@ namespace RandoProbabilityCalculator.ShuffleAlgExplorer
 
                 if (reachableEmptyLocs.Count() == 0)
                 {
-                    var compiled = CompileSingleOutcome(0, Outcome.Failed, new Dictionary<string, long> { { parent, 1 } });
+                    var compiled = CompileSingleOutcome(0, Outcome.Failed, new Dictionary<string, long> { { outcome.GetWorldString(ocCount), 1 } });
                     return compiled;
                 }
                 else

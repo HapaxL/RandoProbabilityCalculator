@@ -41,7 +41,7 @@ namespace RandoProbabilityCalculator.ShuffleAlgExplorer
         {
             if (compileds.Count() == 0)
             {
-                return CompileSingleOutcome(0, Outcome.Failed, new Dictionary<Item, long>());
+                return CompileSingleOutcome(0, Outcome.Failed, new Dictionary<string, long> { { "???", 1 } });
             }
 
             var totals = compileds.ToDictionary(c => c, c => c.Values.Select(co => co.Proportion).Sum());
@@ -59,33 +59,38 @@ namespace RandoProbabilityCalculator.ShuffleAlgExplorer
                     var count = kvp.Value.Count;
                     var probaRate = kvp.Value.Proportion * (lcm / total);
 
+                    Dictionary<string, long> newParents;
+
                     if (allCompiled.ContainsKey(oc))
                     {
-                        Dictionary<Item, long> newParents = null;
-                        if (allCompiled[oc].Parents != null) {
-                            newParents = new Dictionary<string, long>(allCompiled[oc].Parents);
+                        newParents = new Dictionary<string, long>(allCompiled[oc].Parents);
+                    }
+                    else
+                    {
+                        newParents = new Dictionary<string, long>();
+                    }
 
-                            foreach (var parent in kvp.Value.Parents)
-                            {
-                                var parentProbaRate = parent.Value * (lcm / total);
+                    foreach (var parent in kvp.Value.Parents)
+                    {
+                        var parentProbaRate = parent.Value * (lcm / total);
 
-                                if (newParents.ContainsKey(parent.Key))
-                                {
-                                    newParents[parent.Key] += parentProbaRate;
-                                }
-                                else
-                                {
-                                    newParents.Add(parent.Key, parentProbaRate);
-                                }
-                            }
+                        if (newParents.ContainsKey(parent.Key))
+                        {
+                            newParents[parent.Key] += parentProbaRate;
                         }
-                        
+                        else
+                        {
+                            newParents.Add(parent.Key, parentProbaRate);
+                        }
+                    }
 
+                    if (allCompiled.ContainsKey(oc))
+                    {
                         allCompiled[oc] = new CompiledResult(allCompiled[oc].Count + count, allCompiled[oc].Proportion + probaRate, newParents);
                     }
                     else
                     {
-                        allCompiled.Add(oc, new CompiledResult(count, probaRate, kvp.Value.Parents));
+                        allCompiled.Add(oc, new CompiledResult(count, probaRate, newParents));
                     }
                 }
             }
