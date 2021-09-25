@@ -106,7 +106,7 @@ namespace RandoProbabilityCalculator.ShuffleAlgExplorer
 
         public static Dictionary<string, CompiledResult> CompileSingleOutcome(int count, Outcome outcome)
         {
-            return CompileSingleOutcome(count, outcome, default);
+            return CompileSingleOutcome(count, outcome, new Dictionary<Item, long>());
         }
 
         public static void PrintResults(string name, Dictionary<string, CompiledResult> compiled)
