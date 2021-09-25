@@ -45,7 +45,7 @@ namespace RandoProbabilityCalculator.ShuffleAlgExplorer
             }
 
             var totals = compileds.ToDictionary(c => c, c => c.Values.Select(co => co.Proportion).Sum());
-            var lcm = HapaxTools.Math.LeastCommonMultiple(totals.Values.ToList());
+            var lcm = HapaxTools.Math.LeastCommonMultiple(totals.Values);
 
             var allCompiled = new Dictionary<string, CompiledResult>();
 
