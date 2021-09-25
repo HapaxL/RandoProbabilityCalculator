@@ -123,10 +123,18 @@ namespace RandoProbabilityCalculator.ShuffleAlgExplorer
                 if (c.Key == failedOutcomeString)
                 {
                     Console.WriteLine($"{c.Key}: ({c.Value.Count}) {c.Value.Proportion} ({100.0 * c.Value.Proportion / total}% of total)");
+                    foreach (var parent in c.Value.Parents)
+                    {
+                        Console.WriteLine($"    {parent.Key}: {parent.Value} ({100.0 * parent.Value / total}% of total)");
+                    }
                 }
                 else
                 {
                     Console.WriteLine($"{c.Key}: ({c.Value.Count}) {c.Value.Proportion} ({100.0 * c.Value.Proportion / total}% of total, {100.0 * c.Value.Proportion / totalSuccesses}% of successes)");
+                    foreach (var parent in c.Value.Parents)
+                    {
+                        Console.WriteLine($"    {parent.Key}: {parent.Value} ({100.0 * parent.Value / total}% of total, {100.0 * parent.Value / totalSuccesses}% of successes)");
+                    }
                 }
             }
         }
