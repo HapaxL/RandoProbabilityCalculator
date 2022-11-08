@@ -169,7 +169,15 @@ namespace RandoProbabilityCalculator
             Algorithm.PrintResults("Assumed:", acompiled, false);
             Algorithm.PrintResults("Assumed SingleItem:", scompiled, false);
             Algorithm.PrintResults("AssumedExplorer SingleItem:", secompiled, false);
-            
+
+            Console.WriteLine();
+
+            Algorithm.PrintStats("Random:", rcompiled);
+            Algorithm.PrintStats("AssumedExplorer:", aecompiled);
+            Algorithm.PrintStats("Assumed:", acompiled);
+            Algorithm.PrintStats("Assumed SingleItem:", scompiled);
+            Algorithm.PrintStats("AssumedExplorer SingleItem:", secompiled);
+
             Console.WriteLine();
         }
     }

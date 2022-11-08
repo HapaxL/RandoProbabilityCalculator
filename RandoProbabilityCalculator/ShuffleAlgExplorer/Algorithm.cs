@@ -144,5 +144,57 @@ namespace RandoProbabilityCalculator.ShuffleAlgExplorer
                 }
             }
         }
+        
+        public static void PrintStats(string name, Dictionary<string, ResultWithParents> compiled)
+        {
+            Console.WriteLine();
+            Console.WriteLine(name);
+
+            var failedOutcomeString = Outcome.Failed.GetWorldString(0);
+            var total = compiled.Values.Select(kvp => kvp.Proportion).Sum();
+            var totalSuccesses = compiled.ContainsKey(failedOutcomeString) ? (total - compiled[failedOutcomeString].Proportion) : total;
+            var successfulEntryCount = compiled.ContainsKey(failedOutcomeString) ? compiled.Count - 1 : compiled.Count;
+            var proportionValues = new List<long>();
+            var leastLikelyOutcome = default(KeyValuePair<Item, ResultWithParents>);
+            var mostLikelyOutcome = default(KeyValuePair<Item, ResultWithParents>);
+
+            foreach (var c in compiled)
+            {
+                if (c.Key == failedOutcomeString)
+                {
+                    continue;
+                }
+
+                proportionValues.Add(c.Value.Proportion);
+                if (leastLikelyOutcome.Value == null || leastLikelyOutcome.Value.Proportion > c.Value.Proportion)
+                    leastLikelyOutcome = c;
+                if (mostLikelyOutcome.Value == null || mostLikelyOutcome.Value.Proportion < c.Value.Proportion)
+                    mostLikelyOutcome = c;
+            }
+
+            var span = mostLikelyOutcome.Value.Proportion - leastLikelyOutcome.Value.Proportion;
+            var arithmeticMean = totalSuccesses / successfulEntryCount;
+            long median;
+            proportionValues.Sort();
+            if (successfulEntryCount % 2 == 0)
+            {
+                var midpoint = successfulEntryCount / 2;
+                median = (proportionValues[midpoint - 1] + proportionValues[midpoint]) / 2;
+            }
+            else
+            {
+                median = proportionValues[(successfulEntryCount - 1) / 2];
+            }
+
+            var meanAbsoluteDeviation = (proportionValues.Sum(p => Math.Abs(p - arithmeticMean))) / successfulEntryCount;
+            var medianAbsoluteDeviation = (proportionValues.Sum(p => Math.Abs(p - median))) / successfulEntryCount;
+            
+            Console.WriteLine($"Smallest probability: {leastLikelyOutcome.Key} ({leastLikelyOutcome.Value.Proportion}, {100.0 * leastLikelyOutcome.Value.Proportion / totalSuccesses}%)");
+            Console.WriteLine($"Biggest probability: {mostLikelyOutcome.Key} ({mostLikelyOutcome.Value.Proportion}, {100.0 * mostLikelyOutcome.Value.Proportion / totalSuccesses}%)");
+            Console.WriteLine($"Probability span: {100.0 * span / totalSuccesses}%");
+            Console.WriteLine($"Arithmetic mean: {100.0 * arithmeticMean / totalSuccesses}%, mean absolute deviation: {100.0 * meanAbsoluteDeviation / totalSuccesses}%");
+            Console.WriteLine($"Median: {100.0 * median / totalSuccesses}%, median absolute deviation: {100.0 * medianAbsoluteDeviation / totalSuccesses}%");
+            Console.WriteLine("(all percentages relative to total successes)");
+        }
     }
 }
