@@ -155,6 +155,7 @@ namespace RandoProbabilityCalculator.ShuffleAlgExplorer
             var totalSuccesses = compiled.ContainsKey(failedOutcomeString) ? (total - compiled[failedOutcomeString].Proportion) : total;
             var successfulEntryCount = compiled.ContainsKey(failedOutcomeString) ? compiled.Count - 1 : compiled.Count;
             var proportionValues = new List<long>();
+            double sum = 0;
             var leastLikelyOutcome = default(KeyValuePair<Item, ResultWithParents>);
             var mostLikelyOutcome = default(KeyValuePair<Item, ResultWithParents>);
 
@@ -166,6 +167,7 @@ namespace RandoProbabilityCalculator.ShuffleAlgExplorer
                 }
 
                 proportionValues.Add(c.Value.Proportion);
+                sum += c.Value.Proportion;
                 if (leastLikelyOutcome.Value == null || leastLikelyOutcome.Value.Proportion > c.Value.Proportion)
                     leastLikelyOutcome = c;
                 if (mostLikelyOutcome.Value == null || mostLikelyOutcome.Value.Proportion < c.Value.Proportion)
@@ -173,8 +175,8 @@ namespace RandoProbabilityCalculator.ShuffleAlgExplorer
             }
 
             var span = mostLikelyOutcome.Value.Proportion - leastLikelyOutcome.Value.Proportion;
-            var arithmeticMean = totalSuccesses / successfulEntryCount;
-            long median;
+            double arithmeticMean = sum / proportionValues.Count;
+            double median;
             proportionValues.Sort();
             if (successfulEntryCount % 2 == 0)
             {
@@ -186,8 +188,8 @@ namespace RandoProbabilityCalculator.ShuffleAlgExplorer
                 median = proportionValues[(successfulEntryCount - 1) / 2];
             }
 
-            var meanAbsoluteDeviation = (proportionValues.Sum(p => Math.Abs(p - arithmeticMean))) / successfulEntryCount;
-            var medianAbsoluteDeviation = (proportionValues.Sum(p => Math.Abs(p - median))) / successfulEntryCount;
+            double meanAbsoluteDeviation = proportionValues.Sum(p => Math.Abs(p - arithmeticMean)) / successfulEntryCount;
+            double medianAbsoluteDeviation = proportionValues.Sum(p => Math.Abs(p - median)) / successfulEntryCount;
             
             Console.WriteLine($"Smallest probability: {leastLikelyOutcome.Key} ({leastLikelyOutcome.Value.Proportion}, {100.0 * leastLikelyOutcome.Value.Proportion / totalSuccesses}%)");
             Console.WriteLine($"Biggest probability: {mostLikelyOutcome.Key} ({mostLikelyOutcome.Value.Proportion}, {100.0 * mostLikelyOutcome.Value.Proportion / totalSuccesses}%)");
