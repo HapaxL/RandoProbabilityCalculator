@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using RandoProbabilityCalculator.ShuffleAlgExplorer.ResultCompiler;
 
 namespace RandoProbabilityCalculator.ShuffleAlgExplorer
 {
@@ -9,7 +9,7 @@ namespace RandoProbabilityCalculator.ShuffleAlgExplorer
     {
         int ocCount = 0;
 
-        public override Dictionary<string, CompiledResult> Shuffle(Outcome outcome)
+        public override Dictionary<string, ResultWithParents> Shuffle(Outcome outcome)
         {
             Console.WriteLine("starting random");
             var compiled = SubShuffle(0, outcome);
@@ -17,7 +17,7 @@ namespace RandoProbabilityCalculator.ShuffleAlgExplorer
             return compiled;
         }
 
-        public Dictionary<string, CompiledResult> SubShuffle(int curLoc, Outcome outcome)
+        public Dictionary<string, ResultWithParents> SubShuffle(int curLoc, Outcome outcome)
         {
             if (outcome.UnplacedItems.Count == 0 || outcome.EmptyLocations.Count == 0)
             {
@@ -30,7 +30,7 @@ namespace RandoProbabilityCalculator.ShuffleAlgExplorer
                     return CompileSingleOutcome(ocCount, new FailedOutcome());
             }
 
-            var compileds = new List<Dictionary<string, CompiledResult>>();
+            var compileds = new List<Dictionary<string, ResultWithParents>>();
 
             foreach (var item in outcome.UnplacedItems.Distinct())
             {

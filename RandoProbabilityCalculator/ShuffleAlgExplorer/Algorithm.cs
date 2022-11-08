@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using RandoProbabilityCalculator.ShuffleAlgExplorer.ResultCompiler;
 
 using Item = System.String;
 
@@ -9,7 +9,7 @@ namespace RandoProbabilityCalculator.ShuffleAlgExplorer
 {
     public abstract class Algorithm
     {
-        public abstract Dictionary<string, CompiledResult> Shuffle(Outcome world);
+        public abstract Dictionary<string, ResultWithParents> Shuffle(Outcome world);
 
         public static List<List<Item>> GetPermutations(List<Item> items)
         {
@@ -37,7 +37,7 @@ namespace RandoProbabilityCalculator.ShuffleAlgExplorer
 
             return perms;
         }
-        public static Dictionary<string, CompiledResult> CompileOutcomes(IEnumerable<Dictionary<string, CompiledResult>> compileds)
+        public static Dictionary<string, ResultWithParents> CompileOutcomes(IEnumerable<Dictionary<string, ResultWithParents>> compileds)
         {
             if (compileds.Count() == 0)
             {
@@ -47,7 +47,7 @@ namespace RandoProbabilityCalculator.ShuffleAlgExplorer
             var totals = compileds.ToDictionary(c => c, c => c.Values.Select(co => co.Proportion).Sum());
             var lcm = HapaxTools.Math.LeastCommonMultiple(totals.Values);
 
-            var allCompiled = new Dictionary<string, CompiledResult>();
+            var allCompiled = new Dictionary<string, ResultWithParents>();
 
             foreach (var compiled in compileds)
             {
@@ -86,11 +86,11 @@ namespace RandoProbabilityCalculator.ShuffleAlgExplorer
 
                     if (allCompiled.ContainsKey(oc))
                     {
-                        allCompiled[oc] = new CompiledResult(allCompiled[oc].Count + count, allCompiled[oc].Proportion + probaRate, newParents);
+                        allCompiled[oc] = new ResultWithParents(allCompiled[oc].Count + count, allCompiled[oc].Proportion + probaRate, newParents);
                     }
                     else
                     {
-                        allCompiled.Add(oc, new CompiledResult(count, probaRate, newParents));
+                        allCompiled.Add(oc, new ResultWithParents(count, probaRate, newParents));
                     }
                 }
             }
@@ -98,18 +98,18 @@ namespace RandoProbabilityCalculator.ShuffleAlgExplorer
             return allCompiled;
         }
 
-        public static Dictionary<string, CompiledResult> CompileSingleOutcome(int count, Outcome outcome, Dictionary<Item, long> parents)
+        public static Dictionary<string, ResultWithParents> CompileSingleOutcome(int count, Outcome outcome, Dictionary<Item, long> parents)
         {
             var s = outcome.GetWorldString(count);
-            return new Dictionary<string, CompiledResult>() { { s, new CompiledResult(1, 1, parents) } };
+            return new Dictionary<string, ResultWithParents>() { { s, new ResultWithParents(1, 1, parents) } };
         }
 
-        public static Dictionary<string, CompiledResult> CompileSingleOutcome(int count, Outcome outcome)
+        public static Dictionary<string, ResultWithParents> CompileSingleOutcome(int count, Outcome outcome)
         {
             return CompileSingleOutcome(count, outcome, new Dictionary<Item, long>());
         }
 
-        public static void PrintResults(string name, Dictionary<string, CompiledResult> compiled)
+        public static void PrintResults(string name, Dictionary<string, ResultWithParents> compiled, bool printParents)
         {
             Console.WriteLine();
             Console.WriteLine(name);
@@ -123,17 +123,23 @@ namespace RandoProbabilityCalculator.ShuffleAlgExplorer
                 if (c.Key == failedOutcomeString)
                 {
                     Console.WriteLine($"{c.Key}: ({c.Value.Count}) {c.Value.Proportion} ({100.0 * c.Value.Proportion / total}% of total)");
-                    foreach (var parent in c.Value.Parents)
+                    if (printParents)
                     {
-                        Console.WriteLine($"    {parent.Key}: {parent.Value} ({100.0 * parent.Value / total}% of total)");
+                        foreach (var parent in c.Value.Parents)
+                        {
+                            Console.WriteLine($"    {parent.Key}: {parent.Value} ({100.0 * parent.Value / total}% of total)");
+                        }
                     }
                 }
                 else
                 {
                     Console.WriteLine($"{c.Key}: ({c.Value.Count}) {c.Value.Proportion} ({100.0 * c.Value.Proportion / total}% of total, {100.0 * c.Value.Proportion / totalSuccesses}% of successes)");
-                    foreach (var parent in c.Value.Parents)
+                    if (printParents)
                     {
-                        Console.WriteLine($"    {parent.Key}: {parent.Value} ({100.0 * parent.Value / total}% of total, {100.0 * parent.Value / totalSuccesses}% of successes)");
+                        foreach (var parent in c.Value.Parents)
+                        {
+                            Console.WriteLine($"    {parent.Key}: {parent.Value} ({100.0 * parent.Value / total}% of total, {100.0 * parent.Value / totalSuccesses}% of successes)");
+                        }
                     }
                 }
             }

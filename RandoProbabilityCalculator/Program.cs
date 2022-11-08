@@ -94,17 +94,18 @@ namespace RandoProbabilityCalculator
             {
                 new Item("A"),
                 new Item("B"),
+                new Item("C"),
+                new Item("D"),
                 new Item("x"),
-                new Item("x"),
-                // new Item("x"),
                 // new Item("x"),
                 // new item("x"),
             };
             
             var reqA = new ItemReq(items[0]);
             var reqB = new ItemReq(items[1]);
-            var reqX1 = new ItemReq(items[2]);
-            var reqX2 = new ItemReq(items[3]);
+            var reqC = new ItemReq(items[2]);
+            var reqX1 = new ItemReq(items[3]);
+            var reqX2 = new ItemReq(items[4]);
             var reqX = new ReqOr(reqX1, reqX2);
             var req2X = new ReqAnd(reqX1, reqX2);
 
@@ -116,13 +117,24 @@ namespace RandoProbabilityCalculator
             //    new Location(3, new ReqOr(new ReqAnd(reqA, req2X), new ReqAnd(reqB, reqX), new ReqAnd(reqA, reqB))),
             //};
 
+            //var locations = new List<Location>
+            //{
+            //    new Location(0, ReqExpr.None),
+            //    new Location(1, reqB),
+            //    new Location(2, reqA),
+            //    new Location(3, reqA),
+            //    //new Location(4, reqA),
+            //    //new Location(5, reqA),
+            //    // new Location(6, reqA),
+            //};
+
             var locations = new List<Location>
             {
                 new Location(0, ReqExpr.None),
-                new Location(1, reqB),
+                new Location(1, ReqExpr.None),
                 new Location(2, reqA),
-                new Location(3, reqA),
-                //new Location(4, reqA),
+                new Location(3, new ReqAnd(reqA, reqB)),
+                new Location(4, new ReqAnd(reqA, reqC)),
                 //new Location(5, reqA),
                 // new Location(6, reqA),
             };
@@ -152,11 +164,11 @@ namespace RandoProbabilityCalculator
             var scompiled = single.Shuffle(oc);
             var secompiled = singleE.Shuffle(oc);
 
-            Algorithm.PrintResults("Random:", rcompiled);
-            Algorithm.PrintResults("AssumedExplorer:", aecompiled);
-            Algorithm.PrintResults("Assumed:", acompiled);
-            Algorithm.PrintResults("Assumed SingleItem:", scompiled);
-            Algorithm.PrintResults("AssumedExplorer SingleItem:", secompiled);
+            Algorithm.PrintResults("Random:", rcompiled, false);
+            Algorithm.PrintResults("AssumedExplorer:", aecompiled, false);
+            Algorithm.PrintResults("Assumed:", acompiled, false);
+            Algorithm.PrintResults("Assumed SingleItem:", scompiled, false);
+            Algorithm.PrintResults("AssumedExplorer SingleItem:", secompiled, false);
             
             Console.WriteLine();
         }

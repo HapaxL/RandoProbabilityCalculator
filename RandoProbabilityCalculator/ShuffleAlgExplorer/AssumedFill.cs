@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using RandoProbabilityCalculator.ShuffleAlgExplorer.ResultCompiler;
 
 using Item = System.String;
 
@@ -11,12 +11,12 @@ namespace RandoProbabilityCalculator.ShuffleAlgExplorer
     {
         int ocCount = 0;
 
-        public override Dictionary<string, CompiledResult> Shuffle(Outcome outcome)
+        public override Dictionary<string, ResultWithParents> Shuffle(Outcome outcome)
         {
             Console.WriteLine("starting assumed new");
             var perms = GetPermutations(outcome.UnplacedItems);
 
-            var compileds = new List<Dictionary<string, CompiledResult>>();
+            var compileds = new List<Dictionary<string, ResultWithParents>>();
             foreach (var perm in perms)
             {
                 var compiled = SubShuffle(outcome, perm, outcome.GetWorldString(0));
@@ -26,7 +26,7 @@ namespace RandoProbabilityCalculator.ShuffleAlgExplorer
             return CompileOutcomes(compileds);
         }
 
-        public Dictionary<string, CompiledResult> SubShuffle(Outcome outcome, List<Item> permutation, string parent)
+        public Dictionary<string, ResultWithParents> SubShuffle(Outcome outcome, List<Item> permutation, string parent)
         {
             // Console.WriteLine($"{outcome.UnplacedItems.Count} unplaced items");
 
@@ -42,7 +42,7 @@ namespace RandoProbabilityCalculator.ShuffleAlgExplorer
                 return CompileSingleOutcome(ocCount, outcome, new Dictionary<string, long> { { parent, 1 } });
             }
 
-            var compileds = new List<Dictionary<string, CompiledResult>>();
+            var compileds = new List<Dictionary<string, ResultWithParents>>();
 
             var item = permutation[0];
             var unplaced = permutation.Skip(1).ToList();
