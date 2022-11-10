@@ -157,18 +157,24 @@ namespace RandoProbabilityCalculator
             var assumed = new AssumedFill();
             var single = new AssumedFill_SingleItem();
             var singleE = new AssumedFillExplorer_SingleItem();
+            var forwardO = new ForwardFillSimple(true, false);
+            var forwardL = new ForwardFillSimple(false, true);
 
             var rcompiled = random.Shuffle(oc);
             var aecompiled = assumedE.Shuffle(oc);
             var acompiled = assumed.Shuffle(oc);
             var scompiled = single.Shuffle(oc);
             var secompiled = singleE.Shuffle(oc);
+            var focompiled = forwardO.Shuffle(oc);
+            var flcompiled = forwardL.Shuffle(oc);
 
             Algorithm.PrintResults("Random:", rcompiled, false);
             Algorithm.PrintResults("AssumedExplorer:", aecompiled, false);
             Algorithm.PrintResults("Assumed:", acompiled, false);
             Algorithm.PrintResults("Assumed SingleItem:", scompiled, false);
             Algorithm.PrintResults("AssumedExplorer SingleItem:", secompiled, false);
+            Algorithm.PrintResults("Forward Simple Must Open Locations:", focompiled, false);
+            Algorithm.PrintResults("Forward Simple Must Leave Open Locations:", flcompiled, false);
 
             Console.WriteLine();
 
@@ -177,6 +183,8 @@ namespace RandoProbabilityCalculator
             Algorithm.PrintStats("Assumed:", acompiled);
             Algorithm.PrintStats("Assumed SingleItem:", scompiled);
             Algorithm.PrintStats("AssumedExplorer SingleItem:", secompiled);
+            Algorithm.PrintStats("Forward Simple Must Open Locations:", focompiled);
+            Algorithm.PrintStats("Forward Simple Must Leave Open Locations:", flcompiled);
 
             Console.WriteLine();
         }

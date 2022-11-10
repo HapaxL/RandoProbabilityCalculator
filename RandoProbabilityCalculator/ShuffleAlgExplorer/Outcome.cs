@@ -9,12 +9,14 @@ namespace RandoProbabilityCalculator.ShuffleAlgExplorer
 {
     public class Outcome
     {
+        public List<Item> PlacedItems;
         public List<Item> UnplacedItems;
         public List<Location> EmptyLocations;
         public SortedList<Location, Item> World;
 
         public Outcome(List<Item> items, List<Location> locations)
         {
+            PlacedItems = new List<Item>();
             UnplacedItems = items;
             EmptyLocations = locations;
             World = new SortedList<Location, Item>();
@@ -24,24 +26,27 @@ namespace RandoProbabilityCalculator.ShuffleAlgExplorer
             }
         }
 
-        public Outcome(List<Item> items, List<Location> locations, SortedList<Location, Item> world)
+        public Outcome(List<Item> placedItems, List<Item> unplacedItems, List<Location> locations, SortedList<Location, Item> world)
         {
-            UnplacedItems = items;
+            PlacedItems = placedItems;
+            UnplacedItems = unplacedItems;
             EmptyLocations = locations;
             World = world;
         }
 
         public Outcome WithItemInLocation(Item item, Location location)
         {
+            var placed = new List<Item>(PlacedItems);
             var unplaced = new List<Item>(UnplacedItems);
             var empty = new List<Location>(EmptyLocations);
             var world = new SortedList<Location, Item>(World);
 
+            placed.Add(item);
             unplaced.Remove(item);
             empty.Remove(location);
             world[location] = item;
 
-            return new Outcome(unplaced, empty, world);
+            return new Outcome(placed, unplaced, empty, world);
         }
 
         public bool IsCompletable()
@@ -113,7 +118,7 @@ namespace RandoProbabilityCalculator.ShuffleAlgExplorer
 
     public class FailedOutcome : Outcome
     {
-        public FailedOutcome() : base(null, null, null) { }
+        public FailedOutcome() : base(null, null, null, null) { }
 
         public override string GetWorldString(int count)
         {
