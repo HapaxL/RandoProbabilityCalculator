@@ -25,14 +25,14 @@ namespace RandoProbabilityCalculator.ShuffleAlgExplorer
                 if (ocCount % 1000 == 0) Console.WriteLine(ocCount);
 
                 if (outcome.IsCompletable())
-                    return CompileSingleOutcome(ocCount, outcome);
+                    return CompileSingleOutcome(outcome);
                 else
-                    return CompileSingleOutcome(ocCount, new FailedOutcome());
+                    return CompileSingleOutcome(new FailedOutcome());
             }
 
             var compileds = new List<Dictionary<string, ResultWithParents>>();
 
-            foreach (var item in outcome.UnplacedItems.Distinct())
+            foreach (var item in outcome.UnplacedItems)
             {
                 var loc = outcome.World.ElementAt(curLoc);
 

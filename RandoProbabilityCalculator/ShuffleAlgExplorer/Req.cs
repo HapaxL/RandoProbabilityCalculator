@@ -7,7 +7,7 @@ using Item = System.String;
 
 namespace RandoProbabilityCalculator.ShuffleAlgExplorer
 {
-    public abstract class ReqExpr
+    public abstract class Req
     {
         public abstract bool Solve(List<Item> items);
 
@@ -17,13 +17,15 @@ namespace RandoProbabilityCalculator.ShuffleAlgExplorer
         //}
 
         public static NoReq None = new NoReq();
+
+        public abstract IEnumerable<Item> GetRelatedItems();
     }
 
-    public class ReqAnd : ReqExpr
+    public class ReqAnd : Req
     {
-        public ReqExpr[] Reqs;
+        public Req[] Reqs;
 
-        public ReqAnd(params ReqExpr[] reqs)
+        public ReqAnd(params Req[] reqs)
         {
             Reqs = reqs;
         }
@@ -32,13 +34,18 @@ namespace RandoProbabilityCalculator.ShuffleAlgExplorer
         {
             return Reqs.All(r => r.Solve(items));
         }
+
+        public override IEnumerable<Item> GetRelatedItems()
+        {
+            return Reqs.SelectMany(r => r.GetRelatedItems());
+        }
     }
 
-    public class ReqOr : ReqExpr
+    public class ReqOr : Req
     {
-        public ReqExpr[] Reqs;
+        public Req[] Reqs;
 
-        public ReqOr(params ReqExpr[] reqs)
+        public ReqOr(params Req[] reqs)
         {
             Reqs = reqs;
         }
@@ -47,9 +54,14 @@ namespace RandoProbabilityCalculator.ShuffleAlgExplorer
         {
             return Reqs.Any(r => r.Solve(items));
         }
+
+        public override IEnumerable<Item> GetRelatedItems()
+        {
+            return Reqs.SelectMany(r => r.GetRelatedItems());
+        }
     }
 
-    public class ItemReq : ReqExpr
+    public class ItemReq : Req
     {
         public Item Item;
 
@@ -62,13 +74,23 @@ namespace RandoProbabilityCalculator.ShuffleAlgExplorer
         {
             return items.Contains(Item);
         }
+
+        public override IEnumerable<Item> GetRelatedItems()
+        {
+            return new List<Item>() { Item };
+        }
     }
 
-    public class NoReq : ReqExpr
+    public class NoReq : Req
     {
         public override bool Solve(List<Item> items)
         {
             return true;
+        }
+
+        public override IEnumerable<Item> GetRelatedItems()
+        {
+            return new List<Item>();
         }
     }
 }

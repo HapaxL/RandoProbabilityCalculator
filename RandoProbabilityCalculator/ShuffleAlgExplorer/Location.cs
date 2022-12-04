@@ -9,7 +9,7 @@ namespace RandoProbabilityCalculator.ShuffleAlgExplorer
     public class Location : IComparable<Location>
     {
         public int Id;
-        public ReqExpr Req;
+        public Req Req;
         // public bool HasItem;
         // public Item Item;
 
@@ -25,7 +25,7 @@ namespace RandoProbabilityCalculator.ShuffleAlgExplorer
   //          Item = item;
   //      }
 
-		public Location(int id, ReqExpr req)
+		public Location(int id, Req req)
         {
             Id = id;
             Req = req;
@@ -34,6 +34,11 @@ namespace RandoProbabilityCalculator.ShuffleAlgExplorer
 		public bool CanBeReachedWith(List<Item> items)
         {
             return Req.Solve(items);
+        }
+
+        public IEnumerable<Item> GetRelatedItems()
+        {
+            return Req.GetRelatedItems();
         }
 
         public int CompareTo(Location other)

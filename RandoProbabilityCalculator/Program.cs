@@ -94,20 +94,21 @@ namespace RandoProbabilityCalculator
             {
                 new Item("A"),
                 new Item("B"),
-                new Item("C"),
-                new Item("D"),
+                //new Item("C"),
+                //new Item("D"),
                 new Item("x"),
-                // new Item("x"),
+                new Item("y"),
                 // new item("x"),
             };
             
             var reqA = new ItemReq(items[0]);
             var reqB = new ItemReq(items[1]);
-            var reqC = new ItemReq(items[2]);
-            var reqX1 = new ItemReq(items[3]);
-            var reqX2 = new ItemReq(items[4]);
-            var reqX = new ReqOr(reqX1, reqX2);
-            var req2X = new ReqAnd(reqX1, reqX2);
+            //var reqC = new ItemReq(items[2]);
+            //var reqD = new ItemReq(items[3]);
+            //var reqX1 = new ItemReq(items[4]);
+            //var reqX2 = new ItemReq(items[5]);
+            //var reqX = new ReqOr(reqX1, reqX2);
+            //var req2X = new ReqAnd(reqX1, reqX2);
 
             //var locations = new List<Location>
             //{
@@ -130,13 +131,20 @@ namespace RandoProbabilityCalculator
 
             var locations = new List<Location>
             {
-                new Location(0, ReqExpr.None),
-                new Location(1, ReqExpr.None),
+                //new Location(0, ReqExpr.None),
+                //new Location(1, ReqExpr.None),
+                //new Location(2, reqA),
+                //new Location(3, new ReqAnd(reqA, reqB)),
+                //new Location(4, new ReqAnd(reqA, reqC)),
+                
+                new Location(0, Req.None),
+                new Location(1, Req.None),
+                //new Location(2, Req.None),
                 new Location(2, reqA),
                 new Location(3, new ReqAnd(reqA, reqB)),
-                new Location(4, new ReqAnd(reqA, reqC)),
-                //new Location(5, reqA),
-                // new Location(6, reqA),
+                //new Location(5, new ReqAnd(reqA, reqC)),
+                //new Location(5, reqC),
+                //new Location(5, new ReqOr(reqD, reqC)),
             };
 
             //var locations = new List<Location>
@@ -153,40 +161,59 @@ namespace RandoProbabilityCalculator
             var oc = new Outcome(items, locations);
 
             var random = new RandomFill();
-            var assumedE = new AssumedFillExplorer();
+            var assumedE = new AssumedFillExplorer(false);
+            var assumedEIJ = new AssumedFillExplorer(true);
             var assumed = new AssumedFill();
             var single = new AssumedFill_SingleItem();
             var singleE = new AssumedFillExplorer_SingleItem();
-            var forwardO = new ForwardFillSimple(true, false);
             var forwardL = new ForwardFillSimple(false, true);
+            var forwardO = new ForwardFillSimple(true, false);
 
-            var rcompiled = random.Shuffle(oc);
+            //var rcompiled = random.Shuffle(oc);
             var aecompiled = assumedE.Shuffle(oc);
+            var aeijcompiled = assumedEIJ.Shuffle(oc);
             var acompiled = assumed.Shuffle(oc);
-            var scompiled = single.Shuffle(oc);
-            var secompiled = singleE.Shuffle(oc);
-            var focompiled = forwardO.Shuffle(oc);
-            var flcompiled = forwardL.Shuffle(oc);
+            //var scompiled = single.Shuffle(oc);
+            //var secompiled = singleE.Shuffle(oc);
+            //var flcompiled = forwardL.Shuffle(oc);
+            //var focompiled = forwardO.Shuffle(oc);
 
-            Algorithm.PrintResults("Random:", rcompiled, false);
+            //Algorithm.PrintResults("Random:", rcompiled, false);
             Algorithm.PrintResults("AssumedExplorer:", aecompiled, false);
+            Algorithm.PrintResults("AssumedExplorer ignoring dupes:", aeijcompiled, false);
             Algorithm.PrintResults("Assumed:", acompiled, false);
-            Algorithm.PrintResults("Assumed SingleItem:", scompiled, false);
-            Algorithm.PrintResults("AssumedExplorer SingleItem:", secompiled, false);
-            Algorithm.PrintResults("Forward Simple Must Open Locations:", focompiled, false);
-            Algorithm.PrintResults("Forward Simple Must Leave Open Locations:", flcompiled, false);
+            //Algorithm.PrintResults("Assumed SingleItem:", scompiled, false);
+            //Algorithm.PrintResults("AssumedExplorer SingleItem:", secompiled, false);
+            //Algorithm.PrintResults("Forward Simple Must Leave Open Locations:", flcompiled, false);
+            //Algorithm.PrintResults("Forward Simple Must Open Locations:", focompiled, false);
 
             Console.WriteLine();
 
-            Algorithm.PrintStats("Random:", rcompiled);
+            //Algorithm.PrintStats("Random:", rcompiled);
             Algorithm.PrintStats("AssumedExplorer:", aecompiled);
+            Algorithm.PrintStats("AssumedExplorer ignoring dupes:", aeijcompiled);
             Algorithm.PrintStats("Assumed:", acompiled);
-            Algorithm.PrintStats("Assumed SingleItem:", scompiled);
-            Algorithm.PrintStats("AssumedExplorer SingleItem:", secompiled);
-            Algorithm.PrintStats("Forward Simple Must Open Locations:", focompiled);
-            Algorithm.PrintStats("Forward Simple Must Leave Open Locations:", flcompiled);
+            //Algorithm.PrintStats("Assumed SingleItem:", scompiled);
+            //Algorithm.PrintStats("AssumedExplorer SingleItem:", secompiled);
+            //Algorithm.PrintStats("Forward Simple Must Leave Open Locations:", flcompiled);
+            //Algorithm.PrintStats("Forward Simple Must Open Locations:", focompiled);
 
             Console.WriteLine();
+
+            //var afillsep = assumed.ShufflePermsSeparately(oc);
+            //Console.WriteLine("Separated Assumed results:");
+            //foreach (var c in afillsep)
+            //{
+            //    var sb = new StringBuilder("[");
+            //    foreach (var i in c.Key)
+            //    {
+            //        sb.Append(i);
+            //    }
+            //    sb.Append("]: ");
+            //    sb.Append(c.Value.Sum(u => u.Value.Count));
+            //    sb.Append(" outcomes");
+            //    Algorithm.PrintResults(sb.ToString(), c.Value, false);
+            //}
         }
     }
 }

@@ -90,9 +90,14 @@ namespace RandoProbabilityCalculator.ShuffleAlgExplorer
             return false;
         }
 
-        public virtual string GetWorldString(int count)
+        public virtual string GetWorldString(int depth)
         {
-            var sb = new StringBuilder("<");
+            var sb = new StringBuilder();
+            for (int i = 0; i < depth; i++)
+            {
+                sb.Append("  ");
+            }
+            sb.Append("<");
             foreach (var kvp in World)
             {
                 if (kvp.Value == null)

@@ -39,7 +39,7 @@ namespace RandoProbabilityCalculator.ShuffleAlgExplorer
                 //{
                 //    Console.WriteLine("problematic");
                 //}
-                return CompileSingleOutcome(ocCount, outcome, new Dictionary<string, long> { { parent, 1 } });
+                return CompileSingleOutcome(outcome, new Dictionary<string, long> { { parent, 1 } });
             }
 
             var compileds = new List<Dictionary<string, ResultWithParents>>();
@@ -58,7 +58,7 @@ namespace RandoProbabilityCalculator.ShuffleAlgExplorer
 
                     if (reachable.Count == 0)
                     {
-                        var compiled = CompileSingleOutcome(ocCount, Outcome.Failed, new Dictionary<string, long> { { outcome.GetWorldString(ocCount), 1 } });
+                        var compiled = CompileSingleOutcome(Outcome.Failed, new Dictionary<string, long> { { outcome.GetWorldString(ocCount), 1 } });
                         return compiled;
                     }
                     else if (reachable.Count == 1)
@@ -80,7 +80,7 @@ namespace RandoProbabilityCalculator.ShuffleAlgExplorer
                 }
                 else
                 {
-                    var compiled = CompileSingleOutcome(0, Outcome.Failed, new Dictionary<string, long> { { outcome.GetWorldString(ocCount), 1 } });
+                    var compiled = CompileSingleOutcome(Outcome.Failed, new Dictionary<string, long> { { outcome.GetWorldString(ocCount), 1 } });
                     return compiled;
                 }
             }
@@ -93,7 +93,7 @@ namespace RandoProbabilityCalculator.ShuffleAlgExplorer
 
                 if (reachableEmptyLocs.Count() == 0)
                 {
-                    var compiled = CompileSingleOutcome(0, Outcome.Failed, new Dictionary<string, long> { { outcome.GetWorldString(ocCount), 1 } });
+                    var compiled = CompileSingleOutcome(Outcome.Failed, new Dictionary<string, long> { { outcome.GetWorldString(ocCount), 1 } });
                     return compiled;
                 }
                 else

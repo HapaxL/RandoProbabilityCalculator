@@ -68,7 +68,7 @@ namespace RandoProbabilityCalculator.ShuffleAlgExplorer
                 //{
                 //    Console.WriteLine("problematic");
                 //}
-                return CompileSingleOutcome(ocCount, outcome);
+                return CompileSingleOutcome(outcome);
             }
 
             var compileds = new List<Dictionary<string, ResultWithParents>>();
@@ -83,7 +83,7 @@ namespace RandoProbabilityCalculator.ShuffleAlgExplorer
 
                 if (reachableEmptyLocs.Count() == 0)
                 {
-                    var compiled = CompileSingleOutcome(ocCount, Outcome.Failed);
+                    var compiled = CompileSingleOutcome(Outcome.Failed);
                     compileds.Add(compiled);
                     continue;
                 }

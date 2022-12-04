@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using RandoProbabilityCalculator.ShuffleAlgExplorer.ResultCompiler;
 
 using Item = System.String;
@@ -41,11 +42,22 @@ namespace RandoProbabilityCalculator.ShuffleAlgExplorer
         {
             if (compileds.Count() == 0)
             {
-                return CompileSingleOutcome(0, Outcome.Failed, new Dictionary<string, long> { { "???", 1 } });
+                //Console.WriteLine("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+                return CompileSingleOutcome(Outcome.Failed, new Dictionary<string, long> { { "???", 1 } });
             }
 
             var totals = compileds.ToDictionary(c => c, c => c.Values.Select(co => co.Proportion).Sum());
+
+            //var sb = new StringBuilder("lcm of [ ");
+            //foreach (var v in totals.Values)
+            //{
+            //    sb.Append($"{v} ");
+            //}
+            //sb.AppendLine("]:");
+            
             var lcm = HapaxTools.Math.LeastCommonMultiple(totals.Values);
+            //sb.AppendLine(lcm.ToString());
+            //Console.WriteLine(sb.ToString());
 
             var allCompiled = new Dictionary<string, ResultWithParents>();
 
@@ -58,6 +70,7 @@ namespace RandoProbabilityCalculator.ShuffleAlgExplorer
                     var oc = kvp.Key;
                     var count = kvp.Value.Count;
                     var probaRate = kvp.Value.Proportion * (lcm / total);
+                    // Console.WriteLine($"{kvp.Value.Proportion} * ({lcm} / {total}) = {probaRate}");
 
                     Dictionary<string, long> newParents;
 
@@ -95,18 +108,44 @@ namespace RandoProbabilityCalculator.ShuffleAlgExplorer
                 }
             }
 
+            //var sb = new StringBuilder("compiled: ");
+            //foreach (var c in allCompiled)
+            //{
+            //    sb.Append($"{c.Key} {c.Value.Proportion}, ");
+            //}
+            //Console.WriteLine(sb.ToString());
+
             return allCompiled;
         }
 
-        public static Dictionary<string, ResultWithParents> CompileSingleOutcome(int count, Outcome outcome, Dictionary<Item, long> parents)
+        public static Dictionary<string, ResultWithParents> CompileSingleOutcome(Outcome outcome, Dictionary<Item, long> parents)
         {
-            var s = outcome.GetWorldString(count);
+            var s = outcome.GetWorldString(0);
             return new Dictionary<string, ResultWithParents>() { { s, new ResultWithParents(1, 1, parents) } };
         }
 
-        public static Dictionary<string, ResultWithParents> CompileSingleOutcome(int count, Outcome outcome)
+        public static Dictionary<string, ResultWithParents> CompileSingleOutcome(Outcome outcome)
         {
-            return CompileSingleOutcome(count, outcome, new Dictionary<Item, long>());
+            return CompileSingleOutcome(outcome, new Dictionary<Item, long>());
+        }
+
+        // useful means non-junk
+        public static IEnumerable<Item> GetUsefulItems(List<Item> items, List<Location> locations)
+        {
+            var allUsefulItems = locations.SelectMany(l => l.GetRelatedItems());
+            return items.Intersect(allUsefulItems);
+        }
+
+        public static IEnumerable<Item> GetJunkItems(List<Item> items, List<Location> locations)
+        {
+            var allUsefulItems = locations.SelectMany(l => l.GetRelatedItems());
+            return items.Except(allUsefulItems);
+        }
+
+        public static IEnumerable<Item> GetJunkLast(List<Item> items, List<Location> locations)
+        {
+            var allUsefulItems = locations.SelectMany(l => l.GetRelatedItems());
+            return items.Intersect(allUsefulItems).Concat(items.Except(allUsefulItems));
         }
 
         public static void PrintResults(string name, Dictionary<string, ResultWithParents> compiled, bool printParents)
@@ -158,11 +197,13 @@ namespace RandoProbabilityCalculator.ShuffleAlgExplorer
             double sum = 0;
             var leastLikelyOutcome = default(KeyValuePair<Item, ResultWithParents>);
             var mostLikelyOutcome = default(KeyValuePair<Item, ResultWithParents>);
+            long failureProportion = 0;
 
             foreach (var c in compiled)
             {
                 if (c.Key == failedOutcomeString)
                 {
+                    failureProportion = c.Value.Proportion;
                     continue;
                 }
 
@@ -175,6 +216,7 @@ namespace RandoProbabilityCalculator.ShuffleAlgExplorer
             }
 
             var span = mostLikelyOutcome.Value.Proportion - leastLikelyOutcome.Value.Proportion;
+            var spanFactor = 1.0 * mostLikelyOutcome.Value.Proportion / leastLikelyOutcome.Value.Proportion;
             double arithmeticMean = sum / proportionValues.Count;
             double median;
             proportionValues.Sort();
@@ -190,13 +232,15 @@ namespace RandoProbabilityCalculator.ShuffleAlgExplorer
 
             double meanAbsoluteDeviation = proportionValues.Sum(p => Math.Abs(p - arithmeticMean)) / successfulEntryCount;
             double medianAbsoluteDeviation = proportionValues.Sum(p => Math.Abs(p - median)) / successfulEntryCount;
+            double failureRate = 100.0 * failureProportion / (totalSuccesses + failureProportion);
             
-            Console.WriteLine($"Smallest probability: {leastLikelyOutcome.Key} ({leastLikelyOutcome.Value.Proportion}, {100.0 * leastLikelyOutcome.Value.Proportion / totalSuccesses}%)");
-            Console.WriteLine($"Biggest probability: {mostLikelyOutcome.Key} ({mostLikelyOutcome.Value.Proportion}, {100.0 * mostLikelyOutcome.Value.Proportion / totalSuccesses}%)");
-            Console.WriteLine($"Probability span: {100.0 * span / totalSuccesses}%");
-            Console.WriteLine($"Arithmetic mean: {100.0 * arithmeticMean / totalSuccesses}%, mean absolute deviation: {100.0 * meanAbsoluteDeviation / totalSuccesses}%");
-            Console.WriteLine($"Median: {100.0 * median / totalSuccesses}%, median absolute deviation: {100.0 * medianAbsoluteDeviation / totalSuccesses}%");
-            Console.WriteLine("(all percentages relative to total successes)");
+            Console.WriteLine($"  Success rate: {100.0 - failureRate}%, failure rate: {failureRate}%");
+            Console.WriteLine("all percentages below are relative to success rate:");
+            Console.WriteLine($"  Smallest probability: {leastLikelyOutcome.Key} ({leastLikelyOutcome.Value.Proportion}, {100.0 * leastLikelyOutcome.Value.Proportion / totalSuccesses}%)");
+            Console.WriteLine($"  Biggest probability: {mostLikelyOutcome.Key} ({mostLikelyOutcome.Value.Proportion}, {100.0 * mostLikelyOutcome.Value.Proportion / totalSuccesses}%)");
+            Console.WriteLine($"  Probability span: {100.0 * span / totalSuccesses}% (factor {spanFactor}x)");
+            Console.WriteLine($"  Arithmetic mean: {100.0 * arithmeticMean / totalSuccesses}%, mean absolute deviation: {100.0 * meanAbsoluteDeviation / totalSuccesses}%");
+            Console.WriteLine($"  Median: {100.0 * median / totalSuccesses}%, median absolute deviation: {100.0 * medianAbsoluteDeviation / totalSuccesses}%");
         }
     }
 }

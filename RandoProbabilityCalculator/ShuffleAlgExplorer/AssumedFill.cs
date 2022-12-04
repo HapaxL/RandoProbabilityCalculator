@@ -13,7 +13,7 @@ namespace RandoProbabilityCalculator.ShuffleAlgExplorer
 
         public override Dictionary<string, ResultWithParents> Shuffle(Outcome outcome)
         {
-            Console.WriteLine("starting assumed new");
+            Console.WriteLine("starting assumed");
             var perms = GetPermutations(outcome.UnplacedItems);
 
             var compileds = new List<Dictionary<string, ResultWithParents>>();
@@ -22,8 +22,22 @@ namespace RandoProbabilityCalculator.ShuffleAlgExplorer
                 var compiled = SubShuffle(outcome, perm, outcome.GetWorldString(0));
                 compileds.Add(compiled);
             }
-            Console.WriteLine("ending assumed new");
+            Console.WriteLine("ending assumed");
             return CompileOutcomes(compileds);
+        }
+
+        public Dictionary<List<Item>, Dictionary<string, ResultWithParents>> ShufflePermsSeparately(Outcome outcome)
+        {
+            Console.WriteLine("starting assumed (shuffling perms separately)");
+            var perms = GetPermutations(outcome.UnplacedItems);
+            var compileds = new Dictionary<List<Item>, Dictionary<string, ResultWithParents>>();
+            foreach (var perm in perms)
+            {
+                var compiled = SubShuffle(outcome, perm, outcome.GetWorldString(0));
+                compileds.Add(perm, compiled);
+            }
+            Console.WriteLine("ending assumed");
+            return compileds;
         }
 
         public Dictionary<string, ResultWithParents> SubShuffle(Outcome outcome, List<Item> permutation, string parent)
@@ -39,7 +53,7 @@ namespace RandoProbabilityCalculator.ShuffleAlgExplorer
                 //{
                 //    Console.WriteLine("problematic");
                 //}
-                return CompileSingleOutcome(ocCount, outcome, new Dictionary<string, long> { { parent, 1 } });
+                return CompileSingleOutcome(outcome, new Dictionary<string, long> { { parent, 1 } });
             }
 
             var compileds = new List<Dictionary<string, ResultWithParents>>();
@@ -51,7 +65,7 @@ namespace RandoProbabilityCalculator.ShuffleAlgExplorer
 
             if (reachableEmptyLocs.Count() == 0)
             {
-                var compiled = CompileSingleOutcome(ocCount, Outcome.Failed, new Dictionary<string, long> { { outcome.GetWorldString(0), 1 } });
+                var compiled = CompileSingleOutcome(Outcome.Failed, new Dictionary<string, long> { { outcome.GetWorldString(0), 1 } });
                 return compiled;
             }
 

@@ -32,7 +32,7 @@ namespace RandoProbabilityCalculator.ShuffleAlgExplorer
                 //{
                 //    Console.WriteLine("problematic");
                 //}
-                return CompileSingleOutcome(ocCount, outcome);
+                return CompileSingleOutcome(outcome);
             }
 
             var compileds = new List<Dictionary<string, ResultWithParents>>();
@@ -41,7 +41,7 @@ namespace RandoProbabilityCalculator.ShuffleAlgExplorer
 
             var newOutcome = outcome;
 
-            foreach (var item in newOutcome.UnplacedItems.Distinct())
+            foreach (var item in outcome.UnplacedItems.Distinct())
             {
                 var unplaced = new List<Item>(newOutcome.UnplacedItems);
                 unplaced.Remove(item);
@@ -64,7 +64,7 @@ namespace RandoProbabilityCalculator.ShuffleAlgExplorer
             {
                 if (result.Value.Count == 0)
                 {
-                    var compiled = CompileSingleOutcome(ocCount, Outcome.Failed);
+                    var compiled = CompileSingleOutcome(Outcome.Failed);
                     compileds.Add(compiled);
                     continue;
                 }
