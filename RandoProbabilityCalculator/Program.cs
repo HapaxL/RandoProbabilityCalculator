@@ -1,6 +1,8 @@
-﻿using RandoProbabilityCalculator.ShuffleAlgExplorer;
+﻿using HapaxTools;
+using RandoProbabilityCalculator.ShuffleAlgExplorer;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
@@ -94,17 +96,17 @@ namespace RandoProbabilityCalculator
             {
                 new Item("A"),
                 new Item("B"),
-                //new Item("C"),
-                //new Item("D"),
+                new Item("C"),
+                new Item("D"),
                 new Item("x"),
-                new Item("y"),
-                // new item("x"),
+                new Item("x"),
+                //new Item("y"),
             };
             
             var reqA = new ItemReq(items[0]);
             var reqB = new ItemReq(items[1]);
-            //var reqC = new ItemReq(items[2]);
-            //var reqD = new ItemReq(items[3]);
+            var reqC = new ItemReq(items[2]);
+            var reqD = new ItemReq(items[3]);
             //var reqX1 = new ItemReq(items[4]);
             //var reqX2 = new ItemReq(items[5]);
             //var reqX = new ReqOr(reqX1, reqX2);
@@ -131,20 +133,14 @@ namespace RandoProbabilityCalculator
 
             var locations = new List<Location>
             {
-                //new Location(0, ReqExpr.None),
-                //new Location(1, ReqExpr.None),
-                //new Location(2, reqA),
-                //new Location(3, new ReqAnd(reqA, reqB)),
-                //new Location(4, new ReqAnd(reqA, reqC)),
-                
                 new Location(0, Req.None),
                 new Location(1, Req.None),
                 //new Location(2, Req.None),
                 new Location(2, reqA),
                 new Location(3, new ReqAnd(reqA, reqB)),
                 //new Location(5, new ReqAnd(reqA, reqC)),
-                //new Location(5, reqC),
-                //new Location(5, new ReqOr(reqD, reqC)),
+                new Location(4, reqC),
+                new Location(5, new ReqOr(reqD, reqC)),
             };
 
             //var locations = new List<Location>
@@ -160,45 +156,17 @@ namespace RandoProbabilityCalculator
 
             var oc = new Outcome(items, locations);
 
-            var random = new RandomFill();
-            var assumedE = new AssumedFillExplorer(false);
-            var assumedEIJ = new AssumedFillExplorer(true);
-            var assumed = new AssumedFill();
-            var single = new AssumedFill_SingleItem();
-            var singleE = new AssumedFillExplorer_SingleItem();
-            var forwardL = new ForwardFillSimple(false, true);
-            var forwardO = new ForwardFillSimple(true, false);
-
-            //var rcompiled = random.Shuffle(oc);
-            var aecompiled = assumedE.Shuffle(oc);
-            var aeijcompiled = assumedEIJ.Shuffle(oc);
-            var acompiled = assumed.Shuffle(oc);
-            //var scompiled = single.Shuffle(oc);
-            //var secompiled = singleE.Shuffle(oc);
-            //var flcompiled = forwardL.Shuffle(oc);
-            //var focompiled = forwardO.Shuffle(oc);
-
-            //Algorithm.PrintResults("Random:", rcompiled, false);
-            Algorithm.PrintResults("AssumedExplorer:", aecompiled, false);
-            Algorithm.PrintResults("AssumedExplorer ignoring dupes:", aeijcompiled, false);
-            Algorithm.PrintResults("Assumed:", acompiled, false);
-            //Algorithm.PrintResults("Assumed SingleItem:", scompiled, false);
-            //Algorithm.PrintResults("AssumedExplorer SingleItem:", secompiled, false);
-            //Algorithm.PrintResults("Forward Simple Must Leave Open Locations:", flcompiled, false);
-            //Algorithm.PrintResults("Forward Simple Must Open Locations:", focompiled, false);
-
-            Console.WriteLine();
-
-            //Algorithm.PrintStats("Random:", rcompiled);
-            Algorithm.PrintStats("AssumedExplorer:", aecompiled);
-            Algorithm.PrintStats("AssumedExplorer ignoring dupes:", aeijcompiled);
-            Algorithm.PrintStats("Assumed:", acompiled);
-            //Algorithm.PrintStats("Assumed SingleItem:", scompiled);
-            //Algorithm.PrintStats("AssumedExplorer SingleItem:", secompiled);
-            //Algorithm.PrintStats("Forward Simple Must Leave Open Locations:", flcompiled);
-            //Algorithm.PrintStats("Forward Simple Must Open Locations:", focompiled);
-
-            Console.WriteLine();
+            var bench = new Benchmark();
+            bench.Add("Random", new RandomFill());
+            bench.Add("AssumedExplorer", new AssumedFillExplorer(false));
+            bench.Add("AssumedExplorer ignoring dupes", new AssumedFillExplorer(true));
+            bench.Add("Assumed", new AssumedFill(false));
+            bench.Add("Assumed ignoring junk", new AssumedFill(true));
+            //bench.Add("Assumed SingleItem", new AssumedFill_SingleItem());
+            //bench.Add("AssumedExplorer SingleItem", new AssumedFillExplorer_SingleItem());
+            //bench.Add("Forward Simple Must Leave Open Locations", new ForwardFillSimple(false, true));
+            //bench.Add("Forward Simple Must Open Locations", new ForwardFillSimple(true, false));
+            bench.Run(oc);
 
             //var afillsep = assumed.ShufflePermsSeparately(oc);
             //Console.WriteLine("Separated Assumed results:");

@@ -33,7 +33,7 @@ namespace RandoProbabilityCalculator.ShuffleAlgExplorer
             if (outcome.UnplacedItems.Count == 0 || outcome.EmptyLocations.Count == 0)
             {
                 ocCount++;
-                if (ocCount % 1000 == 0) Console.WriteLine(ocCount);
+                if (ocCount % 10000 == 0) Console.WriteLine(ocCount);
                 // CompileOutcome(ocCount, compiled, outcome);
                 //if (ocCount == 682922)
                 //{

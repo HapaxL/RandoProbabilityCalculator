@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using RandoProbabilityCalculator.ShuffleAlgExplorer.ResultCompiler;
+using HapaxTools;
 
 using Item = System.String;
 
@@ -133,19 +134,19 @@ namespace RandoProbabilityCalculator.ShuffleAlgExplorer
         public static IEnumerable<Item> GetUsefulItems(List<Item> items, List<Location> locations)
         {
             var allUsefulItems = locations.SelectMany(l => l.GetRelatedItems());
-            return items.Intersect(allUsefulItems);
+            return items.IntersectRange(allUsefulItems);
         }
 
         public static IEnumerable<Item> GetJunkItems(List<Item> items, List<Location> locations)
         {
             var allUsefulItems = locations.SelectMany(l => l.GetRelatedItems());
-            return items.Except(allUsefulItems);
+            return items.SubtractRange(allUsefulItems);
         }
 
         public static IEnumerable<Item> GetJunkLast(List<Item> items, List<Location> locations)
         {
             var allUsefulItems = locations.SelectMany(l => l.GetRelatedItems());
-            return items.Intersect(allUsefulItems).Concat(items.Except(allUsefulItems));
+            return items.IntersectRange(allUsefulItems).Concat(items.SubtractRange(allUsefulItems));
         }
 
         public static void PrintResults(string name, Dictionary<string, ResultWithParents> compiled, bool printParents)
@@ -230,8 +231,8 @@ namespace RandoProbabilityCalculator.ShuffleAlgExplorer
                 median = proportionValues[(successfulEntryCount - 1) / 2];
             }
 
-            double meanAbsoluteDeviation = proportionValues.Sum(p => Math.Abs(p - arithmeticMean)) / successfulEntryCount;
-            double medianAbsoluteDeviation = proportionValues.Sum(p => Math.Abs(p - median)) / successfulEntryCount;
+            double meanAbsoluteDeviation = proportionValues.Sum(p => System.Math.Abs(p - arithmeticMean)) / successfulEntryCount;
+            double medianAbsoluteDeviation = proportionValues.Sum(p => System.Math.Abs(p - median)) / successfulEntryCount;
             double failureRate = 100.0 * failureProportion / (totalSuccesses + failureProportion);
             
             Console.WriteLine($"  Success rate: {100.0 - failureRate}%, failure rate: {failureRate}%");
